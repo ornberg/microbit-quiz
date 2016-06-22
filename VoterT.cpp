@@ -49,7 +49,7 @@ void onButton(MicroBitEvent e)
 {	
     if (e.source == MICROBIT_ID_BUTTON_A){
 			uBit.radio.datagram.send("0001");
-			uBit.serial.send("0001");
+			uBit.serial.send("1:0001");
 			uBit.sleep(100);
 		}
 
@@ -76,9 +76,9 @@ int main()
 {
      // Initialise the micro:bit runtime.
     uBit.init();
-	uBit.radio.enable();
-	uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM, onData);
-	uBit.messageBus.listen(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_CLICK, onButton);
+    uBit.radio.enable();
+    uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM, onData);
+    uBit.messageBus.listen(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_CLICK, onButton);
     uBit.messageBus.listen(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_CLICK, onButton);
     uBit.messageBus.listen(MICROBIT_ID_BUTTON_AB, MICROBIT_BUTTON_EVT_CLICK, onButton);
 	
