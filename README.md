@@ -1,1 +1,1 @@
-# microbit-quiz
+# micro:bit quiz
