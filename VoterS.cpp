@@ -95,7 +95,7 @@ void onData(MicroBitEvent)
 {
     PacketBuffer p = uBit.radio.datagram.recv();
 	ManagedString s = p[0];
-	if(s == "0001:0" && !connectedFlag)
+	if(s == "1:0001" && !connectedFlag)
 		uBit.radio.datagram.send(serial);
 	else if (s == serial && !connectedFlag)
 		connectedFlag = 1;
