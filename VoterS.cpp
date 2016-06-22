@@ -51,9 +51,9 @@ ManagedString sessionID = "abcD";
 int questionID = 4; 
 
 
-// Number of questions available questions in the current session
+// Number of questions available answers in the current session
 
-int numberOfQuestions;
+int numberOfAnswers;
 
 
 // Number of the letter displayed so that char letter = 32+letterNumber
@@ -102,7 +102,7 @@ void onData(MicroBitEvent)
 	else if (connectedFlag && !(sessionID == s.substring(0,4))){
 		sessionID = s.substring(2,6);
 		questionID = atoi((s.substring(7,s.length())).toCharArray());
-		numberOfQuestions = p[1];
+		numberOfAnswers = p[1];
 		letterNumber = 0;
 		buttonBlock = 1;
 		uBit.display.print(char(65+letterNumber));
@@ -127,7 +127,7 @@ void onButton(MicroBitEvent e)
 {	
     if (e.source == MICROBIT_ID_BUTTON_A && buttonBlock){
 		if(letterNumber == 0)
-			letterNumber = numberOfQuestions;
+			letterNumber = numberOfAnswers;
 		else
 			letterNumber--;
 		
@@ -135,7 +135,7 @@ void onButton(MicroBitEvent e)
 	}
 
     if (e.source == MICROBIT_ID_BUTTON_B && buttonBlock){
-		if(letterNumber == numberOfQuestions-1)
+		if(letterNumber == numberOfAnswers-1)
 			letterNumber = 0;
 		else
 			letterNumber++;
@@ -170,8 +170,8 @@ int main()
 	// Initialise the micro:bit listeners for radio datagrams and button events.
 	uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM, onData);
 	uBit.messageBus.listen(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_CLICK, onButton);
-    	uBit.messageBus.listen(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_CLICK, onButton);
-    	uBit.messageBus.listen(MICROBIT_ID_BUTTON_AB, MICROBIT_BUTTON_EVT_CLICK, onButton);
+    uBit.messageBus.listen(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_CLICK, onButton);
+    uBit.messageBus.listen(MICROBIT_ID_BUTTON_AB, MICROBIT_BUTTON_EVT_CLICK, onButton);
 	
 	// Sets the display mode to black & white to make sure our 'tick' and 'cross' images show up correctly
 	uBit.display.setDisplayMode(DISPLAY_MODE_BLACK_AND_WHITE);
