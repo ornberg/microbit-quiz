@@ -43,12 +43,12 @@ int connectedFlag = 0 ;
 
 // Sets the current session number
 
-ManagedString session = "";
+ManagedString sessionID = "abcD";
 
 
 // Sets the number of the current question of the session
 
-int question; 
+int questionID = 4; 
 
 
 // Number of questions available questions in the current session
@@ -99,9 +99,9 @@ void onData(MicroBitEvent)
 		uBit.radio.datagram.send(serial);
 	else if (s == serial && !connectedFlag)
 		connectedFlag = 1;
-	else if (connectedFlag && !(session == s.substring(0,4))){
-		session = s.substring(0,4);
-		question = atoi((s.substring(5,s.length())).toCharArray());
+	else if (connectedFlag && !(sessionID == s.substring(0,4))){
+		sessionID = s.substring(2,6);
+		questionID = atoi((s.substring(7,s.length())).toCharArray());
 		numberOfQuestions = p[1];
 		letterNumber = 0;
 		buttonBlock = 1;
@@ -145,7 +145,7 @@ void onButton(MicroBitEvent e)
 	
 	
 	if (e.source == MICROBIT_ID_BUTTON_AB && buttonBlock){
-		ManagedString s = letterNumber;
+		ManagedString s = sessionID + ":" + questionID + ":" + letterNumber;
 		uBit.radio.datagram.send(s);
 		buttonBlock = 0;
 		uBit.display.print(tickImage);
@@ -170,11 +170,16 @@ int main()
 	// Initialise the micro:bit listeners for radio datagrams and button events.
 	uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM, onData);
 	uBit.messageBus.listen(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_CLICK, onButton);
-    uBit.messageBus.listen(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_CLICK, onButton);
-    uBit.messageBus.listen(MICROBIT_ID_BUTTON_AB, MICROBIT_BUTTON_EVT_CLICK, onButton);
+    	uBit.messageBus.listen(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_CLICK, onButton);
+    	uBit.messageBus.listen(MICROBIT_ID_BUTTON_AB, MICROBIT_BUTTON_EVT_CLICK, onButton);
 	
 	// Sets the display mode to black & white to make sure our 'tick' and 'cross' images show up correctly
 	uBit.display.setDisplayMode(DISPLAY_MODE_BLACK_AND_WHITE);
+
+	
+	ManagedString s = sessionID + ":" + questionID;
+	uBit.serial.send(s);
+	
 	
 	// Get into powersaving sleep mode
 	while(1)
