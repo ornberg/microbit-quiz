@@ -39,17 +39,21 @@ int numberOfAnswers;
 
 void onData(MicroBitEvent)
 {
-    PacketBuffer p = uBit.radio.datagram.recv();
-	ManagedString s = p[0];
+    ManagedString s = uBit.radio.datagram.recv();
+	uBit.serial.send(s);
+	uBit.serial.send(" - ");
 	if (s.length() == 10)
-		uBit.radio.datagram.send(p);
+		uBit.radio.datagram.send(s);
+	uBit.sleep(10);
 }
 
 void onButton(MicroBitEvent e)
 {	
     if (e.source == MICROBIT_ID_BUTTON_A){
-			uBit.radio.datagram.send("0001");
+			uBit.radio.datagram.send("1:0001");
 			uBit.serial.send("1:0001");
+			uBit.serial.send(" - ");
+			uBit.display.print("<");
 			uBit.sleep(100);
 		}
 
@@ -63,6 +67,9 @@ void onButton(MicroBitEvent e)
 		numberOfAnswers = 2 + uBit.random(4);
 		ManagedString message = "1:" + s + ":" + question + ":" + numberOfAnswers;
 		uBit.serial.send(message);
+		uBit.radio.datagram.send(message);
+		uBit.serial.send(" - ");
+		uBit.display.print(">");
 		uBit.sleep(100);
 	}
 	
@@ -76,9 +83,9 @@ int main()
 {
      // Initialise the micro:bit runtime.
     uBit.init();
-    uBit.radio.enable();
-    uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM, onData);
-    uBit.messageBus.listen(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_CLICK, onButton);
+	uBit.radio.enable();
+	uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM, onData);
+	uBit.messageBus.listen(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_CLICK, onButton);
     uBit.messageBus.listen(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_CLICK, onButton);
     uBit.messageBus.listen(MICROBIT_ID_BUTTON_AB, MICROBIT_BUTTON_EVT_CLICK, onButton);
 	
