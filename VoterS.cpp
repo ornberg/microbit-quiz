@@ -93,16 +93,15 @@ MicroBitImage crossImage("1,0,0,0,1\n0,1,0,1,0\n0,0,1,0,0\n0,1,0,1,0\n1,0,0,0,1\
 
 void onData(MicroBitEvent)
 {
-    PacketBuffer p = uBit.radio.datagram.recv();
-	ManagedString s = p[0];
-	if(s == "1:0001" && !connectedFlag)
+    ManagedString s = uBit.radio.datagram.recv();
+	if(s == "1:0001")
 		uBit.radio.datagram.send(serial);
 	else if (s == serial && !connectedFlag)
 		connectedFlag = 1;
 	else if (connectedFlag && !(sessionID == s.substring(0,4))){
 		sessionID = s.substring(2,6);
 		questionID = atoi((s.substring(7,s.length())).toCharArray());
-		numberOfAnswers = p[1];
+		numberOfAnswers = s.charAt(s.length()-1)-48;
 		letterNumber = 0;
 		buttonBlock = 1;
 		uBit.display.print(char(65+letterNumber));
@@ -149,6 +148,7 @@ void onButton(MicroBitEvent e)
 		uBit.radio.datagram.send(s);
 		buttonBlock = 0;
 		uBit.display.print(tickImage);
+		uBit.sleep(200);
 	}
 	
 	if (!buttonBlock){
