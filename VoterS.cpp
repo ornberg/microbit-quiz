@@ -38,17 +38,17 @@ ManagedString serial = uBit.getSerial();
 
 // Sets a flag to see if this micro:bit is connected to the master
 
-int connectedFlag = 0 ;
+bool connectedFlag = 0 ;
 
 
 // Sets the current session number
 
-ManagedString sessionID = "abcD";
+ManagedString sessionID;
 
 
 // Sets the number of the current question of the session
 
-int questionID = 4; 
+int questionID; 
 
 
 // Number of questions available answers in the current session
@@ -59,11 +59,6 @@ int numberOfAnswers;
 // Number of the letter displayed so that char letter = 32+letterNumber
 
 int letterNumber;
-
-
-// While this equals 0, it blocks the buttons A and B until next question arrives
-
-int buttonBlock = 0;
 
 
 //The image of a tick
@@ -80,32 +75,36 @@ MicroBitImage crossImage("1,0,0,0,1\n0,1,0,1,0\n0,0,1,0,0\n0,1,0,1,0\n1,0,0,0,1\
 
 	This method triggers when a datagram is received.
 	
-	The datagram is turned into a PacketBuffer from which point p[0] can be:
+	The datagram is valid if it starts with "1:"
 	
-	1) A start sequence to connect to the master micro:bit
+	The three expected messages are:
 	
-	2) The micro:bit's own serial as a confirmation of connection
+	A) "1:<the micro:bit's own serial number>"
+
+	B) "1:<session ID>:<number of the question>:<number of possible answers>"
 	
-	3) The details of the session such as the first 4 characters are the session ID, then a ':', then the number of
-	   the current question. In this case the PacketBuffer has also got a p[1] which is the number of possible answers.
+	C) "1:0"
 
 */
 
 void onData(MicroBitEvent)
 {
-    ManagedString s = uBit.radio.datagram.recv();
-	if(s == "1:0001")
-		uBit.radio.datagram.send(serial);
-	else if (s == serial && !connectedFlag)
+    ManagedString message = uBit.radio.datagram.recv();
+
+	if (message.substring(2,10) == serial && (message.substring(0,2) == "1:"))
 		connectedFlag = 1;
-	else if (connectedFlag && !(sessionID == s.substring(0,4))){
-		sessionID = s.substring(2,6);
-		questionID = atoi((s.substring(7,s.length())).toCharArray());
-		numberOfAnswers = s.charAt(s.length()-1)-48;
+	else if (connectedFlag && !(sessionID == message.substring(0,4)) && (message.substring(0,2) == "1:")){
+		int messageLength = message.length();
+		sessionID = message.substring(2,6);
+		int counter = 1;
+		while(!(message.charAt(7+counter) == ":"))
+			counter++;
+		question = atoi(message.substring(7, counter).toCharArray());
+		numberOfAnswers = atoi(message.substring(8 + counter, messageLength - 9).toCharArray());
 		letterNumber = 0;
-		buttonBlock = 1;
 		uBit.display.print(char(65+letterNumber));
-	}
+	} else if (message.charAt(2) == 0 && (message.substring(0,2) == "1:"))
+		uBit.display.print("The session have ended");
 }
 
 
@@ -114,17 +113,16 @@ void onData(MicroBitEvent)
 
 	This method triggers when a button is clicked.
 	
-	If the buttonBlock equals '1', A and B are used to navigate between the available answers, AB is used to
+	A and B are used to navigate between the available answers, AB is used to
 	send the answer currently appearing on the screen and then display the 'tick' image.
 	
-	If the buttonBlock equals '0', the 'cross' image appears briefly instead without anything else happening.
 
 */
 
 
 void onButton(MicroBitEvent e)
 {	
-    if (e.source == MICROBIT_ID_BUTTON_A && buttonBlock){
+    if (e.source == MICROBIT_ID_BUTTON_A){
 		if(letterNumber == 0)
 			letterNumber = numberOfAnswers;
 		else
@@ -133,7 +131,7 @@ void onButton(MicroBitEvent e)
 		uBit.display.print(char(65+letterNumber));
 	}
 
-    if (e.source == MICROBIT_ID_BUTTON_B && buttonBlock){
+    if (e.source == MICROBIT_ID_BUTTON_B){
 		if(letterNumber == numberOfAnswers-1)
 			letterNumber = 0;
 		else
@@ -143,18 +141,35 @@ void onButton(MicroBitEvent e)
 	}
 	
 	
-	if (e.source == MICROBIT_ID_BUTTON_AB && buttonBlock){
-		ManagedString s = sessionID + ":" + questionID + ":" + letterNumber;
-		uBit.radio.datagram.send(s);
-		buttonBlock = 0;
-		uBit.display.print(tickImage);
-		uBit.sleep(200);
-	}
-	
-	if (!buttonBlock){
-		uBit.display.print(crossImage);
-		uBit.sleep(500);
-		uBit.display.clear();
+	if (e.source == MICROBIT_ID_BUTTON_AB){
+		ManagedString message = uBit.getSerial() + ":" + sessionID + ":" + questionID + ":" + letterNumber;
+		uBit.radio.datagram.send(message);
+		uBit.display.print("^");
+		uBit.sleep(100);
+		for(int i = 0; i < 6; i++){
+			if(connectedFlag){
+				connectedFlag = 0;
+				uBit.display.print(tickImage);
+				uBit.sleep(2000);
+				uBit.display.clear();
+			} else {
+				if(i == 5){
+					uBit.display.print(crossImage);
+					uBit.sleep(2000);
+					uBit.display.clear();
+					uBit.display.print(char(65+letterNumber));
+					break;
+				}
+				uBit.radio.datagram.send(message);
+				uBit.display.clear();
+				uBit.sleep(200);
+				uBit.display.print("^");
+				uBit.sleep(i * 1000);
+				
+			}
+		}
+		
+				
 	}
 }
 
@@ -176,9 +191,6 @@ int main()
 	// Sets the display mode to black & white to make sure our 'tick' and 'cross' images show up correctly
 	uBit.display.setDisplayMode(DISPLAY_MODE_BLACK_AND_WHITE);
 
-	
-	ManagedString s = sessionID + ":" + questionID;
-	uBit.serial.send(s);
 	
 	
 	// Get into powersaving sleep mode
