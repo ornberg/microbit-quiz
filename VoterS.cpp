@@ -97,9 +97,9 @@ void onData(MicroBitEvent)
 		int messageLength = message.length();
 		sessionID = message.substring(2,6);
 		int counter = 1;
-		while(!(message.charAt(7+counter) == ":"))
+		while(!(message.substring(7+counter,1) == ":"))
 			counter++;
-		question = atoi(message.substring(7, counter).toCharArray());
+		questionID = atoi(message.substring(7, counter).toCharArray());
 		numberOfAnswers = atoi(message.substring(8 + counter, messageLength - 9).toCharArray());
 		letterNumber = 0;
 		uBit.display.print(char(65+letterNumber));
