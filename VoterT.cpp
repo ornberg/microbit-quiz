@@ -33,93 +33,76 @@ MicroBit uBit;
 
 // The number of the question we're on in the current session
 
-int question = 1;
+int questionID = 1;
 
 // 4 capital letters randomly generated as the ID of the current session (ex.: EZAP)
 
-ManagedString session;
+ManagedString quizID;
 
 // Number of possible answers for the current question
 
-ManagedString numberOfAnswers;
+ManagedString alternatives;
 
 
 /*
 
-	Sets up the session ID, the number of the question and the number of answers based on a serial message,
+	Sets up the session ID, the number of the questionID and the number of answers based on a serial message,
 	then send it out to the listening micro:bits
 	
-	ex.: "1:EZAP:3:4" is the third question of session 'EZAP' with the possible answers A, B, C and D
+	ex.: incoming == "set:ABCD:1:4;"
+		
 
 */
 
-void option1(ManagedString incoming){
-	if(session == incoming.substring(2,4)){
-					question++;
-				} else {
-					question = 1;
-				}
-				session = incoming.substring(2,4);
-				numberOfAnswers = incoming.charAt(7);
-				ManagedString message = "1:" + session + ":" + question + ":" + numberOfAnswers;
-				uBit.radio.datagram.send(message);
-}
+void set(ManagedString incoming){
 
-
-/*
-
-	Sends back the serial number of a micro:bit as connection verification
+	uBit.radio.datagram.send(incoming);
 	
-	ex.: "1:1232654392"
+}
+
+
+/*
+
+	Sends the received answer from a micro:bit through the serial line
+	
+	ex.: incoming == "ans:ABCD:1:012345689:2;"
 
 */
 
-void option2(ManagedString incoming){
-	ManagedString message = "1:" + incoming.substring(2,incoming.length()-2);
-	uBit.radio.datagram.send(message);
+void ans(ManagedString incoming){
+	
+	uBit.serial.send(incoming);
+	
+	// DELETE
+	
+	uBit.radio.datagram.send("ack:" + incoming.substring(4,incoming.length()-4));
+
 }
 
 /*
 
-	Sets up the session ID, the number of the question and the number of answers based on a serial message
-	without sending it (same as option 1 without sending)
+	Sends back an acknowledgement received through the serial line to the other micro:bits as a datagram
+	
+	ex.: income == "ack:ABCD:1:012345689:2;"
 
 */
 
-void option3(ManagedString incoming){
-	if(session == incoming.substring(2,4)){
-		question++;
-	} else {
-		question = 1;
-	}
-	session = incoming.substring(2,4);
-	numberOfAnswers = incoming.substring(7, incoming.length()-7);
+void ack(ManagedString incoming){
+	
+	uBit.radio.datagram.send(incoming);
 	
 }
 
 /*
 
-	Send out the session ID, number of the current question and the number of possible answers to the listening micro:bits
-	(same as option 1 without changin any value)
+	Broadcast a kill signal to the micro:bits
+
+*/
+
+void stp(){
 	
-	ex.: "1:EZAP:3:4" is the third question of session 'EZAP' with the possible answers A, B, C and D
-
-*/
-
-void option4(){
-	ManagedString message = "1:" + session + ":" + question + ":" + numberOfAnswers;
-	uBit.radio.datagram.send(message);
-}
-
-
-/*
-
-	Sends back an error message through the serial line
-
-*/
-
-void option5(){
-	uBit.radio.datagram.send("1:0");
+	uBit.radio.datagram.send("stp;");
+	
 }
 
 
@@ -129,8 +112,8 @@ void option5(){
 
 */
 
-void option6(){
-	uBit.display.print(session);
+void displayQuizID(){
+	uBit.display.print(quizID);
 	uBit.sleep(1000);
 	uBit.display.clear();
 }
@@ -142,8 +125,8 @@ void option6(){
 
 */
 
-void option7(){
-	uBit.display.print(question);
+void displayQuestionID(){
+	uBit.display.print(questionID);
 	uBit.sleep(1000);
 	uBit.display.clear();
 }
@@ -155,8 +138,8 @@ void option7(){
 
 */
 
-void option8(){
-	uBit.display.print(numberOfAnswers);
+void displayAlternatives(){
+	uBit.display.print(alternatives);
 	uBit.sleep(1000);
 	uBit.display.clear();
 }
@@ -165,14 +148,21 @@ void option8(){
 
 /*
 	
-	Sends any received datagrams through the serial line
+	Sends any received 'ans' datagrams through the serial line
 	
 */
 
 void onData(MicroBitEvent)
 {
-    ManagedString s = uBit.radio.datagram.recv();
-	uBit.serial.send(s);
+	ManagedString message = uBit.radio.datagram.recv();
+	
+	if (message.substring(0,3) == "ans")
+		ans(message);
+
+	
+	
+		
+
 }
 
 /*
@@ -186,25 +176,27 @@ void onData(MicroBitEvent)
 void onButton(MicroBitEvent e)
 {	
     if (e.source == MICROBIT_ID_BUTTON_A){
-			option6();
-			option7();
-			option8();
+			
+			displayQuizID();
+			displayQuestionID();
+			displayAlternatives();
 		}
 
     if (e.source == MICROBIT_ID_BUTTON_B){
-		uBit.serial.send("1:1");
+		
+		uBit.serial.send("nxt;");
 		uBit.display.print(">");
 		uBit.sleep(500);
 		uBit.display.clear();
 	}
-		
+	
+	uBit.sleep(20);
 }
 
 
 /*
 
-	On receiving data through the serial line, reads it and fire a function according to the message id.
-	If no id is recognised, sends back an error message
+	On receiving data through the serial line, if we can recognise the id fire the corresponding function and send back an "ack;"
 
 */
 
@@ -212,29 +204,34 @@ void reader()
 {
 	char first;
 	while(1){
+		
+		
 		if(first = uBit.serial.read(SYNC_SLEEP)){
 			uBit.sleep(50);
-			int length = uBit.serial.rxBufferedSize();
-			char c[length+2];
-			c[0] = first;
-			for(int i = 1; i < length+1; i++)
-				c[i] = uBit.serial.read(SYNC_SLEEP);
-			c[length+1] = 0;
-			ManagedString incoming = c;
+			ManagedString incoming = first;
+			while(uBit.serial.rxBufferedSize()){
+				first = uBit.serial.read(SYNC_SLEEP);
+				incoming = incoming + first;
+			}
 			
-			ManagedString id = incoming.charAt(0);
-			if(id == "1"){
-				option1(incoming);
-			} else if (id == "2"){
-				option2(incoming);
-			} else if(id == "3"){
-				option3(incoming);
-			} else if(id == "4"){
-				option4();
-			} else if(id == "5"){
-				option5();
-			} else {
-				uBit.serial.send("101010");
+			
+			ManagedString id = incoming.substring(0,3);
+			
+			//	DELETE
+			uBit.display.print("1");
+			uBit.sleep(500);
+			uBit.display.clear();			
+		
+			
+			if(id == "set"){
+				uBit.serial.send("ack;");
+				set(incoming);
+			} else if(id == "ack"){
+				uBit.serial.send("ack;");
+				ack(incoming);
+			} else if(id == "stp"){
+				uBit.serial.send("ack;");
+				stp();
 			}
 		}
 		
@@ -255,6 +252,9 @@ int main()
 	uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM, onData);
 	uBit.messageBus.listen(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_CLICK, onButton);
     uBit.messageBus.listen(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_CLICK, onButton);
+	
+	// Sets the group to an arbitrary number (59 in this case) to avoid interference 
+	uBit.radio.setGroup(59);
 	
 	// Creates a new fiber that listens for incoming serial signals
 	create_fiber(reader);
