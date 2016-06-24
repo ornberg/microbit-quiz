@@ -43,7 +43,7 @@ bool connectedFlag = 0 ;
 
 // Sets the current session number
 
-ManagedString sessionID;
+ManagedString quizID;
 
 
 // Sets the number of the current question of the session
@@ -53,12 +53,17 @@ int questionID;
 
 // Number of questions available answers in the current session
 
-int numberOfAnswers;
+int alternatives;
 
 
-// Number of the letter displayed so that char letter = 32+letterNumber
+// Number of the letter displayed so that char letter = 32 + letterNumber
 
 int letterNumber;
+
+
+//
+
+ManagedString answer;
 
 
 //The image of a tick
@@ -75,36 +80,50 @@ MicroBitImage crossImage("1,0,0,0,1\n0,1,0,1,0\n0,0,1,0,0\n0,1,0,1,0\n1,0,0,0,1\
 
 	This method triggers when a datagram is received.
 	
-	The datagram is valid if it starts with "1:"
-	
 	The three expected messages are:
 	
-	A) "1:<the micro:bit's own serial number>"
+	A) "set:<quizID>:<questionID>:<alternatives>;"
 
-	B) "1:<session ID>:<number of the question>:<number of possible answers>"
+	B) "ack:<quizID>:<questionID>:<serial>:<answer>;"
 	
-	C) "1:0"
+	C) "stp;"
 
 */
 
 void onData(MicroBitEvent)
 {
     ManagedString message = uBit.radio.datagram.recv();
-
-	if (message.substring(2,10) == serial && (message.substring(0,2) == "1:"))
-		connectedFlag = 1;
-	else if (connectedFlag && !(sessionID == message.substring(0,4)) && (message.substring(0,2) == "1:")){
-		int messageLength = message.length();
-		sessionID = message.substring(2,6);
-		int counter = 1;
-		while(!(message.substring(7+counter,1) == ":"))
+	
+	int counter = 0;
+	
+	if(message.substring(0,3) == "set"){
+		ManagedString incomingQuizID = message.substring(4,4);
+		ManagedString incomingQuestionID;
+		ManagedString incomingAlternatives;
+		
+		while(message.charAt(9 + counter) != 58){ // 58 is the ASCII value of ":"
+			incomingQuestionID = incomingQuestionID + message.charAt(9 + counter);
 			counter++;
-		questionID = atoi(message.substring(7, counter).toCharArray());
-		numberOfAnswers = atoi(message.substring(8 + counter, messageLength - 9).toCharArray());
-		letterNumber = 0;
-		uBit.display.print(char(65+letterNumber));
-	} else if (message.charAt(2) == 0 && (message.substring(0,2) == "1:"))
-		uBit.display.print("The session have ended");
+		}
+		while(message.charAt(10 + counter) != 59){
+			incomingAlternatives = incomingAlternatives + message.charAt(10 + counter);
+			counter++;
+		}
+		
+		
+		if(!(incomingQuizID == quizID) && !(incomingQuestionID == questionID)){
+			uBit.display.scrollAsync("Question " + incomingQuestionID);
+			quizID = incomingQuizID;
+			questionID = atoi(incomingQuestionID.toCharArray());
+			alternatives = atoi(incomingAlternatives.toCharArray());
+			letterNumber = 0;
+			uBit.display.print(char(65 + letterNumber));
+		}
+	} else if (message == ("ack:" + answer) ){
+		connectedFlag = 1;
+	} else if (message == "stp;"){
+		uBit.display.scrollAsync("The session have ended");
+	}
 }
 
 
@@ -124,7 +143,7 @@ void onButton(MicroBitEvent e)
 {	
     if (e.source == MICROBIT_ID_BUTTON_A){
 		if(letterNumber == 0)
-			letterNumber = numberOfAnswers;
+			letterNumber = alternatives-1;
 		else
 			letterNumber--;
 		
@@ -132,7 +151,7 @@ void onButton(MicroBitEvent e)
 	}
 
     if (e.source == MICROBIT_ID_BUTTON_B){
-		if(letterNumber == numberOfAnswers-1)
+		if(letterNumber == alternatives-1)
 			letterNumber = 0;
 		else
 			letterNumber++;
@@ -142,34 +161,32 @@ void onButton(MicroBitEvent e)
 	
 	
 	if (e.source == MICROBIT_ID_BUTTON_AB){
-		ManagedString message = uBit.getSerial() + ":" + sessionID + ":" + questionID + ":" + letterNumber;
+		answer = quizID + ":" + questionID + ":" + serial + ":" + letterNumber + ";";
+		ManagedString message = "ans:" + answer;
 		uBit.radio.datagram.send(message);
 		uBit.display.print("^");
 		uBit.sleep(100);
-		for(int i = 0; i < 6; i++){
-			if(connectedFlag){
-				connectedFlag = 0;
-				uBit.display.print(tickImage);
-				uBit.sleep(2000);
-				uBit.display.clear();
-			} else {
-				if(i == 5){
-					uBit.display.print(crossImage);
-					uBit.sleep(2000);
-					uBit.display.clear();
-					uBit.display.print(char(65+letterNumber));
-					break;
-				}
-				uBit.radio.datagram.send(message);
-				uBit.display.clear();
-				uBit.sleep(200);
-				uBit.display.print("^");
-				uBit.sleep(i * 1000);
-				
-			}
+		int counter = 0;
+		while (!connectedFlag && counter < 5)
+		{
+			uBit.radio.datagram.send(message);
+			uBit.display.clear();
+			uBit.sleep(200);
+			uBit.display.print("^");
+			uBit.sleep(counter * 1000);
+			counter++;
 		}
-		
-				
+		if(connectedFlag){
+			connectedFlag = 0;
+			uBit.display.print(tickImage);
+			uBit.sleep(2000);
+			uBit.display.clear();
+		} else {
+			uBit.display.print(crossImage);
+			uBit.sleep(2000);
+			uBit.display.clear();
+			uBit.display.print(char(65+letterNumber));
+		}
 	}
 }
 
@@ -191,7 +208,8 @@ int main()
 	// Sets the display mode to black & white to make sure our 'tick' and 'cross' images show up correctly
 	uBit.display.setDisplayMode(DISPLAY_MODE_BLACK_AND_WHITE);
 
-	
+	// Sets the group to an arbitrary number (59 in this case) to avoid interference 
+	uBit.radio.setGroup(59);
 	
 	// Get into powersaving sleep mode
 	while(1)
