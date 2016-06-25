@@ -1,0 +1,11 @@
+{
+  "name": "microbit-zsamples",
+  "version": "0.0.2",
+  "description": "Multi-choice polling system from the BBC micro:bit!",
+  "license": "MIT",
+  "dependencies": {
+    "microbit": "lancaster-university/microbit"
+  },
+  "targetDependencies": {},
+  "bin": "./source"
+}
