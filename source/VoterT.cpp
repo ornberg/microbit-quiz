@@ -42,6 +42,14 @@ ManagedString quizID;
 
 ManagedString alternatives;
 
+const char * const radio_waves ="\
+    000,000,000,000,000,  000,000,000,000,000,  000,000,255,255,255\n\
+    000,000,000,000,000,  000,000,000,000,000,  000,255,000,000,000\n\
+    000,000,000,000,000,  000,000,000,255,255,  255,000,000,255,255\n\
+    000,000,000,000,000,  000,000,255,000,000,  255,000,255,000,000\n\
+    000,000,000,000,255,  000,000,255,000,255,  255,000,255,000,255\n";
+
+MicroBitImage radio(radio_waves);
 
 /*
 
@@ -53,10 +61,10 @@ ManagedString alternatives;
 
 */
 
-void set(ManagedString incoming){
-
+void set(ManagedString incoming)
+{
+    uBit.display.animateAsync(radio, 500, 5, 0, 0);
 	uBit.radio.datagram.send(incoming);
-	
 }
 
 
@@ -202,12 +210,6 @@ void reader()
         ManagedString incoming = uBit.serial.readUntil(";") + ";";
         ManagedString id = incoming.substring(0,3);
 
-        //	DELETE
-        uBit.display.print("1");
-        uBit.sleep(500);
-        uBit.display.clear();			
-
-
         if(id == "set"){
             uBit.serial.send("ack;");
             set(incoming);
@@ -245,6 +247,8 @@ int main()
     // a packet. This guarantees correct parsing of packets.
     uBit.serial.setRxBufferSize(32);
 
+    // Run a short animaiton at power up.
+    uBit.display.animateAsync(radio, 500, 5, 0, 0);
 	
 	// Creates a new fiber that listens for incoming serial signals
 	create_fiber(reader);
