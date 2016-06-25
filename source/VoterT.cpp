@@ -197,41 +197,28 @@ void onButton(MicroBitEvent e)
 
 void reader()
 {
-	char first;
-	while(1){
-		
-		
-		if(first = uBit.serial.read(SYNC_SLEEP)){
-			uBit.sleep(50);
-			ManagedString incoming = first;
-			while(uBit.serial.rxBufferedSize()){
-				first = uBit.serial.read(SYNC_SLEEP);
-				incoming = incoming + first;
-			}
-			
-			
-			ManagedString id = incoming.substring(0,3);
-			
-			//	DELETE
-			uBit.display.print("1");
-			uBit.sleep(500);
-			uBit.display.clear();			
-		
-			
-			if(id == "set"){
-				uBit.serial.send("ack;");
-				set(incoming);
-			} else if(id == "ack"){
-				uBit.serial.send("ack;");
-				ack(incoming);
-			} else if(id == "stp"){
-				uBit.serial.send("ack;");
-				stp();
-			}
-		}
-		
-		uBit.sleep(50);
-	}
+    while(1){
+
+        ManagedString incoming = uBit.serial.readUntil(";") + ";";
+        ManagedString id = incoming.substring(0,3);
+
+        //	DELETE
+        uBit.display.print("1");
+        uBit.sleep(500);
+        uBit.display.clear();			
+
+
+        if(id == "set"){
+            uBit.serial.send("ack;");
+            set(incoming);
+        } else if(id == "ack"){
+            uBit.serial.send("ack;");
+            ack(incoming);
+        } else if(id == "stp"){
+            uBit.serial.send("ack;");
+            stp();
+        }
+    }
 }
 
 
