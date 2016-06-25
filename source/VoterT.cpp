@@ -250,6 +250,11 @@ int main()
 	
 	// Sets the group to an arbitrary number (59 in this case) to avoid interference 
 	uBit.radio.setGroup(59);
+
+    // Increase the receive buffer size on our serial port, to be at least the same size as
+    // a packet. This guarantees correct parsing of packets.
+    uBit.serial.setRxBufferSize(32);
+
 	
 	// Creates a new fiber that listens for incoming serial signals
 	create_fiber(reader);
