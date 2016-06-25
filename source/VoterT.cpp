@@ -72,10 +72,6 @@ void ans(ManagedString incoming){
 	
 	uBit.serial.send(incoming);
 	
-	// DELETE
-	
-	uBit.radio.datagram.send("ack:" + incoming.substring(4,incoming.length()-4));
-
 }
 
 /*
