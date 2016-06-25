@@ -173,17 +173,15 @@ void onButton(MicroBitEvent e)
 	if (e.source == MICROBIT_ID_BUTTON_AB){
 		answer = quizID + ":" + questionID + ":" + serial + ":" + letterNumber + ";";
 		ManagedString message = "ans:" + answer;
-		uBit.radio.datagram.send(message);
-		uBit.display.print("^");
-		uBit.sleep(100);
-		int counter = 0;
-		while (!connectedFlag && counter < 5)
+		int counter = 1;
+
+		while (!connectedFlag && counter <= 5)
 		{
 			uBit.radio.datagram.send(message);
-			uBit.display.clear();
+		    uBit.display.printAsync("^");
+			uBit.sleep(counter * 200);
+		    uBit.display.clear();
 			uBit.sleep(200);
-			uBit.display.print("^");
-			uBit.sleep(counter * 1000);
 			counter++;
 		}
 		if(connectedFlag){
