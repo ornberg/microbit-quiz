@@ -38,6 +38,7 @@ ManagedString serial = uBit.getSerial();
 // Sets a flag to see if this micro:bit is connected to the master
 
 bool connectedFlag = 0 ;
+bool voted = false;
 
 
 // Sets the current session number
@@ -74,6 +75,12 @@ MicroBitImage tickImage("0,0,0,0,0\n0,0,0,0,1\n0,0,0,1,0\n1,0,1,0,0\n0,1,0,0,0\n
 
 MicroBitImage crossImage("1,0,0,0,1\n0,1,0,1,0\n0,0,1,0,0\n0,1,0,1,0\n1,0,0,0,1\n");
 
+MicroBitImage smileyImage("\
+    000,255,000,255,000\n\
+    000,000,000,000,000\n\
+    000,000,000,000,000\n\
+    255,000,000,000,255\n\
+    000,255,255,255,000\n");
 
 /*
 
@@ -109,19 +116,19 @@ void onData(MicroBitEvent)
 			counter++;
 		}
 		
-		
-		if(!(incomingQuizID == quizID) && !(incomingQuestionID == questionID)){
-			uBit.display.scrollAsync("Question " + incomingQuestionID);
+		if(!((incomingQuizID == quizID) && (incomingQuestionID == questionID))){
+			uBit.display.scrollAsync("TIME TO VOTE!");
 			quizID = incomingQuizID;
 			questionID = atoi(incomingQuestionID.toCharArray());
 			alternatives = atoi(incomingAlternatives.toCharArray());
 			letterNumber = 0;
+            voted = false;
 			uBit.display.print(char(65 + letterNumber));
 		}
 	} else if (message == ("ack:" + answer) ){
 		connectedFlag = 1;
 	} else if (message == "stp;"){
-		uBit.display.scrollAsync("The session have ended");
+		uBit.display.scrollAsync("FINISHED!");
 	}
 }
 
@@ -140,6 +147,10 @@ void onData(MicroBitEvent)
 
 void onButton(MicroBitEvent e)
 {	
+    // if we've already voted in this round, then ignore user input until a new question is announced.
+    if (voted)
+        return;
+
     if (e.source == MICROBIT_ID_BUTTON_A){
 		if(letterNumber == 0)
 			letterNumber = alternatives-1;
@@ -177,9 +188,10 @@ void onButton(MicroBitEvent e)
 		}
 		if(connectedFlag){
 			connectedFlag = 0;
+            voted = true;
 			uBit.display.print(tickImage);
 			uBit.sleep(2000);
-			uBit.display.clear();
+            uBit.display.print(smileyImage);
 		} else {
 			uBit.display.print(crossImage);
 			uBit.sleep(2000);
@@ -204,14 +216,13 @@ int main()
     uBit.messageBus.listen(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_CLICK, onButton);
     uBit.messageBus.listen(MICROBIT_ID_BUTTON_AB, MICROBIT_BUTTON_EVT_CLICK, onButton);
 	
-	// Sets the display mode to black & white to make sure our 'tick' and 'cross' images show up correctly
-	uBit.display.setDisplayMode(DISPLAY_MODE_BLACK_AND_WHITE);
-
 	// Sets the group to an arbitrary number (59 in this case) to avoid interference 
 	uBit.radio.setGroup(59);
 	
     // Use the highest output put level on the radio, to increase range and reliability.
     uBit.radio.setTransmitPower(7);
+
+    uBit.display.print(smileyImage);
 
 	// Get into powersaving sleep mode
 	while(1)
