@@ -210,6 +210,9 @@ int main()
 	// Sets the group to an arbitrary number (59 in this case) to avoid interference 
 	uBit.radio.setGroup(59);
 	
+    // Use the highest output put level on the radio, to increase range and reliability.
+    uBit.radio.setTransmitPower(7);
+
 	// Get into powersaving sleep mode
 	while(1)
 		uBit.sleep(10000);

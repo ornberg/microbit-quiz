@@ -238,6 +238,9 @@ int main()
 	// Sets the group to an arbitrary number (59 in this case) to avoid interference 
 	uBit.radio.setGroup(59);
 
+    // Use the highest output put level on the radio, to increase range and reliability.
+    uBit.radio.setTransmitPower(7);
+
     // Increase the receive buffer size on our serial port, to be at least the same size as
     // a packet. This guarantees correct parsing of packets.
     uBit.serial.setRxBufferSize(32);
