@@ -1,0 +1,9 @@
+{
+    "microbit-dal":{
+        "bluetooth":{
+            "enabled": 0
+        },
+        "gatt_table_size": "0x700",
+        "nested_heap_proportion": 0.50
+    }
+}
