@@ -117,7 +117,6 @@ void onData(MicroBitEvent)
 		}
 		
 		if(!((incomingQuizID == quizID) && (incomingQuestionID == questionID))){
-			uBit.display.scrollAsync("TIME TO VOTE!");
 			quizID = incomingQuizID;
 			questionID = atoi(incomingQuestionID.toCharArray());
 			alternatives = atoi(incomingAlternatives.toCharArray());
