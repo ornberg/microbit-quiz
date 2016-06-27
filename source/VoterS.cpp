@@ -34,7 +34,7 @@ MicroBit uBit;
 ManagedString serial = uBit.getSerial();
 
 // Sets a flag to see if this micro:bit is connected to the master
-bool connectedFlag = 0 ;
+bool connectedFlag = 0;
 bool voted = true;
 
 // Sets the current session number
@@ -89,22 +89,22 @@ void onData(MicroBitEvent) {
       counter++;
     }
 
-    while(message.charAt(10 + counter) != 59) {
+    while (message.charAt(10 + counter) != 59) {
       incomingAlternatives = incomingAlternatives + message.charAt(10 + counter);
       counter++;
     }
 
-    if(!((incomingQuizID == quizID) && (incomingQuestionID == questionID))){
+    if (!((incomingQuizID == quizID) && (incomingQuestionID == questionID))) {
       quizID = incomingQuizID;
       questionID = atoi(incomingQuestionID.toCharArray());
       alternatives = atoi(incomingAlternatives.toCharArray());
       letterNumber = 0;
-            voted = false;
+      voted = false;
       uBit.display.print(char(65 + letterNumber));
     }
   }
 
-  else if (message == ("ack:" + answer) ){
+  else if (message == ("ack:" + answer)) {
     connectedFlag = 1;
   } else if (message == "stp;"){
     uBit.display.scrollAsync("FINISHED!");
@@ -118,13 +118,14 @@ void onData(MicroBitEvent) {
 	send the answer currently appearing on the screen and then display the 'tick' image.
 */
 
+bool connecting = 0; //if currently sending anwser, ignore other button presses
 void onButton(MicroBitEvent e) {
   // if we've already voted in this round, then ignore user input until a new question is announced.
-  if (voted)
+  if (voted || connecting)
     return;
 
-    if (e.source == MICROBIT_ID_BUTTON_A){
-      if(letterNumber == 0)
+    if (e.source == MICROBIT_ID_BUTTON_A) {
+      if (letterNumber == 0)
         letterNumber = alternatives-1;
     else
       letterNumber--;
@@ -145,6 +146,7 @@ void onButton(MicroBitEvent e) {
   if (e.source == MICROBIT_ID_BUTTON_AB) {
     answer = quizID + ":" + questionID + ":" + serial + ":" + letterNumber + ";";
     ManagedString message = "ans:" + answer;
+    connecting = true;
     int counter = 1;
 
     while (!connectedFlag && counter <= 5) {
@@ -156,7 +158,7 @@ void onButton(MicroBitEvent e) {
       counter++;
     }
 
-    if(connectedFlag){
+    if (connectedFlag) {
       connectedFlag = 0;
       voted = true;
       uBit.display.print(tickImage);
@@ -168,6 +170,7 @@ void onButton(MicroBitEvent e) {
       uBit.display.clear();
       uBit.display.print(char(65+letterNumber));
     }
+    connecting = false;
   }
 }
 
@@ -181,7 +184,8 @@ int main() {
   uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM, onData);
   uBit.messageBus.listen(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_CLICK, onButton);
   uBit.messageBus.listen(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_CLICK, onButton);
-  uBit.messageBus.listen(MICROBIT_ID_BUTTON_AB, MICROBIT_BUTTON_EVT_CLICK, onButton);
+  uBit.messageBus.listen(MICROBIT_ID_BUTTON_AB, MICROBIT_BUTTON_EVT_CLICK, onButton, MESSAGE_BUS_LISTENER_DROP_IF_BUSY);
+  uBit.messageBus.listen(MICROBIT_ID_BUTTON_AB, MICROBIT_BUTTON_EVT_LONG_CLICK, onButton, MESSAGE_BUS_LISTENER_DROP_IF_BUSY);
 
   // Sets the group to an arbitrary number (59 in this case) to avoid interference
   uBit.radio.setGroup(59);
