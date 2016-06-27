@@ -38,7 +38,7 @@ ManagedString serial = uBit.getSerial();
 // Sets a flag to see if this micro:bit is connected to the master
 
 bool connectedFlag = 0 ;
-bool voted = false;
+bool voted = true;
 
 
 // Sets the current session number
@@ -48,7 +48,7 @@ ManagedString quizID;
 
 // Sets the number of the current question of the session
 
-int questionID; 
+int questionID;
 
 
 // Number of questions available answers in the current session
@@ -85,13 +85,13 @@ MicroBitImage smileyImage("\
 /*
 
 	This method triggers when a datagram is received.
-	
+
 	The three expected messages are:
-	
+
 	A) "set:<quizID>:<questionID>:<alternatives>;"
 
 	B) "ack:<quizID>:<questionID>:<serial>:<answer>;"
-	
+
 	C) "stp;"
 
 */
@@ -99,14 +99,14 @@ MicroBitImage smileyImage("\
 void onData(MicroBitEvent)
 {
     ManagedString message = uBit.radio.datagram.recv();
-	
+
 	int counter = 0;
-	
+
 	if(message.substring(0,3) == "set"){
 		ManagedString incomingQuizID = message.substring(4,4);
 		ManagedString incomingQuestionID;
 		ManagedString incomingAlternatives;
-		
+
 		while(message.charAt(9 + counter) != 58){ // 58 is the ASCII value of ":"
 			incomingQuestionID = incomingQuestionID + message.charAt(9 + counter);
 			counter++;
@@ -115,7 +115,7 @@ void onData(MicroBitEvent)
 			incomingAlternatives = incomingAlternatives + message.charAt(10 + counter);
 			counter++;
 		}
-		
+
 		if(!((incomingQuizID == quizID) && (incomingQuestionID == questionID))){
 			quizID = incomingQuizID;
 			questionID = atoi(incomingQuestionID.toCharArray());
@@ -136,16 +136,16 @@ void onData(MicroBitEvent)
 /*
 
 	This method triggers when a button is clicked.
-	
+
 	A and B are used to navigate between the available answers, AB is used to
 	send the answer currently appearing on the screen and then display the 'tick' image.
-	
+
 
 */
 
 
 void onButton(MicroBitEvent e)
-{	
+{
     // if we've already voted in this round, then ignore user input until a new question is announced.
     if (voted)
         return;
@@ -155,7 +155,7 @@ void onButton(MicroBitEvent e)
 			letterNumber = alternatives-1;
 		else
 			letterNumber--;
-		
+
 		uBit.display.print(char(65+letterNumber));
 	}
 
@@ -164,11 +164,11 @@ void onButton(MicroBitEvent e)
 			letterNumber = 0;
 		else
 			letterNumber++;
-		
+
 		uBit.display.print(char(65+letterNumber));
 	}
-	
-	
+
+
 	if (e.source == MICROBIT_ID_BUTTON_AB){
 		answer = quizID + ":" + questionID + ":" + serial + ":" + letterNumber + ";";
 		ManagedString message = "ans:" + answer;
@@ -206,16 +206,16 @@ int main()
      // Initialise the micro:bit runtime.
     uBit.init();
 	uBit.radio.enable();
-	
+
 	// Initialise the micro:bit listeners for radio datagrams and button events.
 	uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM, onData);
 	uBit.messageBus.listen(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_CLICK, onButton);
     uBit.messageBus.listen(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_CLICK, onButton);
     uBit.messageBus.listen(MICROBIT_ID_BUTTON_AB, MICROBIT_BUTTON_EVT_CLICK, onButton);
-	
-	// Sets the group to an arbitrary number (59 in this case) to avoid interference 
-	uBit.radio.setGroup(59);
-	
+
+	// Sets the group to an arbitrary number (59 in this case) to avoid interference
+	uBit.radio.setGroup(64);
+
     // Use the highest output put level on the radio, to increase range and reliability.
     uBit.radio.setTransmitPower(7);
 
