@@ -1,5 +1,5 @@
 {
-  "name": "microbit-samples",
+  "name": "microbit-quiz",
   "version": "0.0.2",
   "description": "Multi-choice polling system from the BBC micro:bit!",
   "license": "MIT",
