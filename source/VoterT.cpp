@@ -31,192 +31,149 @@ DEALINGS IN THE SOFTWARE.
 MicroBit uBit;
 
 // The number of the question we're on in the current session
-
-int questionID = 1;
+int questionID = 0;
 
 // 4 capital letters randomly generated as the ID of the current session (ex.: EZAP)
-
 ManagedString quizID;
 
 // Number of possible answers for the current question
-
 ManagedString alternatives;
 
 const char * const radio_waves ="\
-    000,000,000,000,000,  000,000,000,000,000,  000,000,255,255,255\n\
-    000,000,000,000,000,  000,000,000,000,000,  000,255,000,000,000\n\
-    000,000,000,000,000,  000,000,000,255,255,  255,000,000,255,255\n\
-    000,000,000,000,000,  000,000,255,000,000,  255,000,255,000,000\n\
-    000,000,000,000,255,  000,000,255,000,255,  255,000,255,000,255\n";
+  000,000,000,000,000,  000,000,000,000,000,  000,000,255,255,255\n\
+  000,000,000,000,000,  000,000,000,000,000,  000,255,000,000,000\n\
+  000,000,000,000,000,  000,000,000,255,255,  255,000,000,255,255\n\
+  000,000,000,000,000,  000,000,255,000,000,  255,000,255,000,000\n\
+  000,000,000,000,255,  000,000,255,000,255,  255,000,255,000,255\n";
 
 MicroBitImage radio(radio_waves);
 
+
 /*
-
-	Sets up the session ID, the number of the questionID and the number of answers based on a serial message,
-	then send it out to the listening micro:bits
-	
-	ex.: incoming == "set:ABCD:1:4;"
-		
-
+  Sets up the session ID, the number of the questionID and the number of answers based on a serial message,
+  then send it out to the listening micro:bits
+  ex.: incoming == "set:ABCD:1:4;"
 */
 
-void set(ManagedString incoming)
-{
-    uBit.display.animateAsync(radio, 500, 5, 0, 0);
-	uBit.radio.datagram.send(incoming);
+void set(ManagedString incoming) {
+  uBit.display.animateAsync(radio, 500, 5, 0, 0);
+  uBit.radio.datagram.send(incoming);
 }
 
 
 /*
-
-	Sends the received answer from a micro:bit through the serial line
-	
-	ex.: incoming == "ans:ABCD:1:012345689:2;"
-
+  Sends the received answer from a micro:bit through the serial line
+  example: incoming == "ans:ABCD:1:012345689:2;"
 */
 
-void ans(ManagedString incoming){
-	
-	uBit.serial.send(incoming);
-	
-}
-
-/*
-
-	Sends back an acknowledgement received through the serial line to the other micro:bits as a datagram
-	
-	ex.: income == "ack:ABCD:1:012345689:2;"
-
-*/
-
-void ack(ManagedString incoming){
-	
-	uBit.radio.datagram.send(incoming);
-	
-}
-
-/*
-
-	Broadcast a kill signal to the micro:bits
-
-*/
-
-void stp(){
-	
-	uBit.radio.datagram.send("stp;");
-	
+void ans(ManagedString incoming) {
+  uBit.serial.send(incoming);
 }
 
 
 /*
-
-	Displays the session ID on the LED display
-
+  Sends back an acknowledgement received through the serial line to the other micro:bits as a datagram
+  example: income == "ack:ABCD:1:012345689:2;"
 */
 
-void displayQuizID(){
-	uBit.display.print(quizID);
-	uBit.sleep(1000);
-	uBit.display.clear();
+void ack(ManagedString incoming) {
+  uBit.radio.datagram.send(incoming);
 }
 
 
 /*
-
-	Displays the number of the current question on the LED display
-
+  Broadcast a kill signal to the micro:bits
 */
 
-void displayQuestionID(){
-	uBit.display.print(questionID);
-	uBit.sleep(1000);
-	uBit.display.clear();
+void stp() {
+  uBit.radio.datagram.send("stp;");
 }
 
 
 /*
-
-	Displays the number of possible answers for the current question on the LED display
-
+  Displays the session ID on the LED display
 */
 
-void displayAlternatives(){
-	uBit.display.print(alternatives);
-	uBit.sleep(1000);
-	uBit.display.clear();
+void displayQuizID() {
+  uBit.display.print(quizID);
+  uBit.sleep(1000);
+  uBit.display.clear();
+}
+
+
+/*
+  Displays the number of the current question on the LED display
+*/
+
+void displayQuestionID() {
+  uBit.display.print(questionID);
+  uBit.sleep(1000);
+  uBit.display.clear();
+}
+
+
+/*
+  Displays the number of possible answers for the current question on the LED display
+*/
+
+void displayAlternatives() {
+  uBit.display.print(alternatives);
+  uBit.sleep(1000);
+  uBit.display.clear();
 }
 
 
 
 /*
-	
-	Sends any received 'ans' datagrams through the serial line
-	
+  Sends any received 'ans' datagrams through the serial line
 */
 
-void onData(MicroBitEvent)
-{
-	ManagedString message = uBit.radio.datagram.recv();
-	
-	if (message.substring(0,3) == "ans")
-		ans(message);
+void onData(MicroBitEvent) {
+  ManagedString message = uBit.radio.datagram.recv();
 
-	
-	
-		
-
+  if (message.substring(0,3) == "ans")
+    ans(message);
 }
 
 /*
-
 	When A is pressed, displays the session ID, number of the current question and the number of possible answers
-	
 	When B is pressed, sends a request for the next question through the serial line
-
 */
 
-void onButton(MicroBitEvent e)
-{	
-    if (e.source == MICROBIT_ID_BUTTON_A){
-			
-			displayQuizID();
-			displayQuestionID();
-			displayAlternatives();
-		}
+void onButton(MicroBitEvent e) {
+  if (e.source == MICROBIT_ID_BUTTON_A){
+    displayQuizID();
+    displayQuestionID();
+    displayAlternatives();
+  }
 
-    if (e.source == MICROBIT_ID_BUTTON_B){
-		
-		uBit.serial.send("nxt;");
-		uBit.display.print(">");
-		uBit.sleep(500);
-		uBit.display.clear();
-	}
-	
-	uBit.sleep(20);
+  if (e.source == MICROBIT_ID_BUTTON_B){
+    uBit.serial.send("nxt;");
+    uBit.display.print(">");
+    uBit.sleep(500);
+    uBit.display.clear();
+  }
+
+  uBit.sleep(20);
 }
 
 
 /*
-
 	On receiving data through the serial line, if we can recognise the id fire the corresponding function and send back an "ack;"
-
 */
 
-void reader()
-{
-    while(1){
-
+void reader() {
+    while(1) {
         ManagedString incoming = uBit.serial.readUntil(";") + ";";
         ManagedString id = incoming.substring(0,3);
 
-        if(id == "set"){
+        if (id == "set"){
             uBit.serial.send("ack;");
             set(incoming);
-        } else if(id == "ack"){
+        } else if (id == "ack") {
             uBit.serial.send("ack;");
             ack(incoming);
-        } else if(id == "stp"){
+        } else if (id == "stp") {
             uBit.serial.send("ack;");
             stp();
         }
@@ -224,38 +181,35 @@ void reader()
 }
 
 
+int main() {
+  // Initialise the micro:bit runtime.
+  uBit.init();
+  uBit.radio.enable();
 
+  // Initialise the micro:bit listeners for radio datagrams and button events.
+  uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM, onData);
+  uBit.messageBus.listen(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_CLICK, onButton);
+  uBit.messageBus.listen(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_CLICK, onButton);
 
-int main()
-{
-     // Initialise the micro:bit runtime.
-    uBit.init();
-	uBit.radio.enable();
-	
-	// Initialise the micro:bit listeners for radio datagrams and button events.
-	uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM, onData);
-	uBit.messageBus.listen(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_CLICK, onButton);
-    uBit.messageBus.listen(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_CLICK, onButton);
-	
-	// Sets the group to an arbitrary number (59 in this case) to avoid interference 
-	uBit.radio.setGroup(59);
+  // Sets the group to an arbitrary number (59 in this case) to avoid interference
+  uBit.radio.setGroup(59);
 
-    // Use the highest output put level on the radio, to increase range and reliability.
-    uBit.radio.setTransmitPower(7);
+  // Use the highest output put level on the radio, to increase range and reliability.
+  uBit.radio.setTransmitPower(7);
 
-    // Increase the receive buffer size on our serial port, to be at least the same size as
-    // a packet. This guarantees correct parsing of packets.
-    uBit.serial.setRxBufferSize(32);
+  // Increase the receive buffer size on our serial port, to be at least the same size as
+  // a packet. This guarantees correct parsing of packets.
+  uBit.serial.setRxBufferSize(32);
 
-    // Run a short animaiton at power up.
-    uBit.display.animateAsync(radio, 500, 5, 0, 0);
-	
-	// Creates a new fiber that listens for incoming serial signals
-	create_fiber(reader);
-	
-	// Get into powersaving sleep mode
-	while(1)
-        uBit.sleep(10000);
+  // Run a short animaiton at power up.
+  uBit.display.animateAsync(radio, 500, 5, 0, 0);
+
+  // Creates a new fiber that listens for incoming serial signals
+  create_fiber(reader);
+
+  // Get into powersaving sleep mode
+  while(1)
+    uBit.sleep(10000);
 }
 
 #endif
