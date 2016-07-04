@@ -1,19 +1,17 @@
-/*NB: 
+/*NB:
 	Background.js has its own console window and will not output logs
 	on the console for the main app.
 	Click the "Inspect views: background page" under chrome://extensions/ for the app
 */
 
 chrome.app.runtime.onLaunched.addListener(function() {
-	chrome.app.window.create('window.html', {
+	chrome.app.window.create('index.html', {
 		'outerBounds' : {
 			'width': 800,
 			'height': 700
 		}
 	});
 });
-
-
 
 /*
 
@@ -58,7 +56,7 @@ var stringReceived = '';
 
 var onReceiveCallback = function(info) {
 	console.log(ab2str(info.data));
-	
+
     if (info.connectionId == expectedConnectionId && info.data) {
       var str = convertArrayBufferToString(info.data);
       if (str.charAt(str.length-1) === '\n') {
@@ -70,7 +68,7 @@ var onReceiveCallback = function(info) {
       }
     }
     console.log(stringReceived);
-    
+
 };
 
 chrome.serial.onReceive.addListener(onReceiveCallback);

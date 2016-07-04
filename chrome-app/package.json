@@ -1,0 +1,14 @@
+{
+  "name": "quizbit-chrome-app",
+  "version": "0.0.1",
+  "devDependencies": {
+    "alt": "^0.18.4",
+    "grunt": "^1.0.1",
+    "grunt-babel": "^6.0.0",
+    "grunt-contrib-clean": "^1.0.0",
+    "grunt-contrib-copy": "^1.0.0",
+    "load-grunt-tasks": "^3.5.0",
+    "react": "^15.1.0"
+  },
+  "dependencies": {}
+}
