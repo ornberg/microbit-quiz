@@ -86,7 +86,7 @@ function updateChart(newLabels, newLabel, newData, colourArray){
 */
 
 function drawChart(){
-	var ctx = document.getElementById("voteResults");
+	var ctx = document.getElementsByClassName("voteResults");
 	var myChart = new Chart(ctx, {
 		type: chartType,
 		data: {
