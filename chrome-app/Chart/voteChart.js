@@ -1,5 +1,5 @@
 var chartLabels = [];			// An array of strings. Each datapoint should have a label otherwise they won't show on the chart
-var chartLabel = '';			// The 'units of measurement' for example 'number of votes' 
+var chartDataLabel = '';			// The 'units of measurement' for example 'number of votes' 
 var chartData = [];				// The datapoints of the chart, the number of datapoints should match the number of labels
 var chartBackgroundColor = [];	// An array of colours for each datapoint. Automatically generated in the updateData() function
 
@@ -38,11 +38,11 @@ function updateLabels(labelsArray){
 }
 
 /* 
-	Updates the 'chartLabel' string
+	Updates the 'chartDataLabel' string
  */
 
 function updateLabel(labelString){
-	chartLabel = labelString;
+	chartDataLabel = labelString;
 }
 
 /* 
@@ -70,13 +70,14 @@ function updateType(typeString){
 }
 
 /*
-	Redraws the chart with new chartLabels, chartLabel and chartData
+	Redraws the chart with new chartLabels, chartDataLabel and chartData
 */
 
-function updateChart(newLabels, newLabel, newData){
+function updateChart(newLabels, newLabel, newData, colourArray){
 	updateLabels(newLabels);
 	updateLabel(newLabel);
 	updateData(newData);
+	updateBackgroundColor(colourArray);
 	drawChart();
 }
 
@@ -91,7 +92,7 @@ function drawChart(){
 		data: {
 			labels: chartLabels,
 			datasets: [{
-				label: chartLabel,
+				label: chartDataLabel,
 				data: chartData,
 				backgroundColor: chartBackgroundColor,
 				borderWidth: 1
