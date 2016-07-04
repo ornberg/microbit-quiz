@@ -99,10 +99,12 @@ function drawChart(){
 			}]
 		},
 		options: {
+			responsive: true,
 			scales: {
 				yAxes: [{
 					ticks: {
-						beginAtZero:true
+						beginAtZero:true,
+						stepSize: 1
 					}
 				}]
 			}
