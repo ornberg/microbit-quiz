@@ -4,23 +4,30 @@ var chartData = [];				// The datapoints of the chart, the number of datapoints 
 var chartBackgroundColor = [];	// An array of colours for each datapoint. Automatically generated in the updateData() function
 
 var	chartType = 'bar'; 			// OPTIONS: 'line', 'bar', 'radar', 'polarArea', 'pie', 'doughnut'
- 
+
+
+
 
 
 /*
+
+	OUTDATED CODE
+
 	Generates a random colour for the datapoints. Source: "http://stackoverflow.com/questions/24815851/how-do-clear-a-chart-from-a-canvas-so-that-hover-events-cannot-be-triggered"
-*/
+
  
  
-function getRandomColor() {
-    var letters = '0123456789ABCDEF'.split('');
-    var color = '#';
-    for (var i = 0; i < 6; i++ ) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-	console.log(color);
-    return color;
+	function getRandomColor() {
+		var letters = '0123456789ABCDEF'.split('');
+		var color = '#';
+		for (var i = 0; i < 6; i++ ) {
+			color += letters[Math.floor(Math.random() * 16)];
+		}
+		console.log(color);
+		return color;
 }
+
+*/
 
 /* 
 	Updates the 'chartLabels' array
@@ -39,22 +46,19 @@ function updateLabel(labelString){
 }
 
 /* 
-	Updates the 'chartData' array as well as fills the 'backgroundColor' array with chartData.length number of random colours
+	Updates the 'chartData' array
  */
 
 function updateData(dataArray){
 	chartData = dataArray;
-	updateBackgroundColor();
 }
 
 /* 
-	Fills the 'backgroundColor' array with chartData.length number of random colours
+	Updates the 'chartBackgroundColor' array 
  */
 
-function updateBackgroundColor(){
-	chartBackgroundColor = [];
-	for(i = 0; i < chartData.length; i++)
-		chartBackgroundColor.push(getRandomColor());
+function updateBackgroundColor(colourArray){
+	chartBackgroundColor = colourArray;
 }
 
 /* 
