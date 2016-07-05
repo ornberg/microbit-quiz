@@ -85,6 +85,9 @@ function drawChart(){
 						stepSize: 1
 					}
 				}]
+			},
+			legend: {
+				display: false
 			}
 		}
 	});
