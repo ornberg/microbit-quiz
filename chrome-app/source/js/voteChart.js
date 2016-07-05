@@ -7,28 +7,6 @@ var	chartType = 'bar'; 			// OPTIONS: 'line', 'bar', 'radar', 'polarArea', 'pie'
 
 
 
-
-
-/*
-
-	OUTDATED CODE
-
-	Generates a random colour for the datapoints. Source: "http://stackoverflow.com/questions/24815851/how-do-clear-a-chart-from-a-canvas-so-that-hover-events-cannot-be-triggered"
-
-
-
-	function getRandomColor() {
-		var letters = '0123456789ABCDEF'.split('');
-		var color = '#';
-		for (var i = 0; i < 6; i++ ) {
-			color += letters[Math.floor(Math.random() * 16)];
-		}
-		console.log(color);
-		return color;
-}
-
-*/
-
 /*
 	Updates the 'chartLabels' array
  */
