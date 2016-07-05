@@ -26,7 +26,7 @@ function Serial(dataCallback)
     }
 
     function onError(err) {
-      if (!(err.error === "device_lost") && !(err.error === "disconnected"))
+      if (!(err.error === "device_lost") && !(err.error === "disconnected") && !(err.error === "break"))  
         throw new Error(err.error); //unknown error
       connected = false;
     }
