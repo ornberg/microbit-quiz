@@ -14,19 +14,33 @@ module.exports = function(grunt) {
           // includes files within path and its sub-directories
           {expand: true, cwd: 'source/', src: ['**', '!js/components/**'], dest: 'build/'},
         ]
+      },
+      lib: {
+        files: [
+          {expand:true, flatten: true,
+            src:
+                [
+                  "node_modules/react/dist/react.js",
+                  "node_modules/react-dom/dist/react-dom.js",
+                  "node_modules/immutable/dist/immutable.min.js",
+                  "node_modules/redux/dist/redux.min.js",
+                  "node_modules/chart.js/dist/Chart.min.js"
+                ],
+            dest: 'build/js/lib/'},
+        ]
       }
     },
     "babel": {
       options: {
         plugins: ["transform-react-jsx"],
-        presets: ["react"]
+        presets: ["es2015", "react"]
       },
       dist: {
         files: [{
           expand: true,
-          cwd: 'source/js/components/',
-          src: ['*.jsx.js'],
-          dest: 'build/js/components', // Custom folder
+          cwd: 'source/js',
+          src: ["**/*.js", '!lib/**'],
+          dest: 'build/js', // Custom folder
           ext: '.js'
         }]
       }
