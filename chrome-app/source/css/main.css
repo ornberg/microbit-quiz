@@ -1,14 +1,39 @@
+@font-face {
+  font-family: "OpenSans-Regular";
+  src: url("fonts/OpenSans-Regular.ttf");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "OpenSans-Semibold";
+  src: url("fonts/OpenSans-Semibold.ttf");
+  font-weight: normal;
+  font-style: normal;
+}
+
 .coloured-A { color: #F08099; }
 .coloured-B { color: #00AFD1; }
 .coloured-C { color: #00D18F; }
 .coloured-D { color: #FBC45B; }
 .coloured-E { color: #CEA2FB; }
-/* .coloured-? ... */
+.coloured-F { color: #d8607b; }
+.coloured-G { color: #80a7e0; }
+.coloured-H { color: #4bc0c0; }
+.coloured-I { color: #faa376; }
+.coloured-J { color: #8875b0; }
+.coloured-K { color: #f0b1d8; }
+
+html { /* Smoothens edges of fonts */
+  text-rendering: optimizeLegibility !important;
+  -webkit-font-smoothing: antialiased !important;
+}
 
 body {
-  color: #4C4C4C;
+  color: #4c4c4c;
   margin: 5%;
-  background-color: #EDEDED;
+  background-color: #ededed;
+  font-family: "OpenSans-Regular";
 }
 
 #app-frame {
@@ -16,9 +41,8 @@ body {
 
 .styled-box {
   background-color: white;
-  /* border: lightgrey 1px solid; */
   border-radius: 3px;
-  box-shadow: 0px 1px 2px 1px #dedddd;
+  box-shadow: 0px 1px 1px #c0c0c0;
   text-align: center;
 }
 
@@ -32,11 +56,10 @@ body {
 
 .vote-box > span {
   font-size: 30px;
-  font-weight: bold;
+  font-family: "OpenSans-Semibold";
 }
 
 .vote-box > p {
-  /* margin: 0px; */
   font-size: 14px;
 }
 
@@ -51,23 +74,37 @@ body {
 .answer {
   display: inline-block;
   min-height: 46px;
-  margin: 5px;
+  margin: 8px;
+  animation:0.3s drop-intro;
+}
+
+@keyframes drop-intro {
+  from {
+    transform:scale(1.1);
+    opacity:0;
+  }
+
+  to {
+    transform:scale(1);
+    opacity:1;
+  }
 }
 
 .answer-letter {
   display: inline-block;
-  padding: 5px 10px;
+  padding: 6px 10px;
   margin: 0px 5px;
-  font-size: 3em;
+  font-size: 30px;
+  font-family: "OpenSans-SemiBold";
 }
 
 .answer-label {
   display: inline-block;
   vertical-align: bottom;
-  padding: 12px;
-  font-size: 2em;
-  margin: 0px 20px;
+  padding: 15px 12px 12px 0;
+  margin-right: 10px;
   text-align: center;
+  font-size: 20px;
 }
 
 .question-title {
@@ -99,6 +136,12 @@ body {
   font-size: 14px;
   color: grey;
   margin: 5px;
+  font-family: "OpenSans-Semibold";
+  transition: transform 0.2s;
+}
+
+.btn:hover:not(:disabled) {
+  transform: scale(1.05);
 }
 
 .btn:disabled {
