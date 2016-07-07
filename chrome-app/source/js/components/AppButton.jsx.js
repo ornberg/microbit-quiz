@@ -1,4 +1,6 @@
-class AppButton extends React.Component {
+import React, { Component } from 'react'
+
+class AppButton extends Component {
   constructor() {
     super();
   }
@@ -8,3 +10,5 @@ class AppButton extends React.Component {
     );
   }
 }
+
+export default AppButton

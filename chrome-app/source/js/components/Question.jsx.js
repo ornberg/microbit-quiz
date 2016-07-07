@@ -1,16 +1,27 @@
-var Question = React.createClass({
-  getInitialState: function () {
-    return {
-      desc: this.props.desc,
-      answers: this.props.answers
-    };
-  },
-  render() {
-    var description = this.state.desc;
-    var answers = this.state.answers;
-		var answers = answers.map(function(ans, index) {
-			return <Answer editHandler={this.props.editHandler} edit={this.props.edit} key={index} index={index} desc={ans}/>;
-		}, this);
-    return <QuestionDisplay edit={this.props.edit} desc={description} answers={answers}/>;
+import React, { Component } from 'react'
+import Answer from './Answer'
+
+class Question extends Component {
+  constructor() {
+    super();
   }
-});
+
+  render() {
+    console.log(this.props.answers);
+    var answers = this.props.answers.map(function(ans, index) {
+			return <Answer deleteAnswerHandler={this.props.deleteAnswerHandler} edit={this.props.edit} answerHandler={this.props.answerHandler} key={index} index={index} label={ans}/>;
+		}, this);
+    console.log(this.props.question);
+    return (
+      <div className="question-box">
+        <input readOnly={!this.props.edit} onChange={this.props.questionHandler} value={this.props.title} className="question-title"/>
+        <ul className={"answer-box" + (this.props.edit ? " edit" : "")}>
+          {answers}
+          { this.props.edit ? <li onClick={this.props.newAnswerHandler} className="create-quiz-btn styled-box"><span className="answer-label">+</span></li> : null }
+        </ul>
+      </div>
+    )
+  }
+}
+
+export default Question

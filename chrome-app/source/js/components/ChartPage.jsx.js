@@ -1,4 +1,7 @@
-class ChartPage extends React.Component {
+import React, { Component } from 'react'
+import { updateChart, drawChart } from '../voteChart'
+
+class ChartPage extends Component {
   constructor() {
     super();
     this.letterColours = [
@@ -11,14 +14,16 @@ class ChartPage extends React.Component {
   }
   componentDidMount() {
     drawChart();
-    updateChart(this.props.question.getAnswerList(), ["Measurement"], this.props.question.getAnswerCounts(), this.letterColours);
+    updateChart(this.props.answers, ["Measurement"], this.props.votes, this.letterColours);
   }
   render() {
     return (
       <div>
-        <h1 className="question-title">{this.props.question.getDesc()}</h1>
+        <h1 className="question-title">Results</h1>
         <canvas className="voteResults"></canvas>
       </div>
     );
   }
 }
+
+export default ChartPage

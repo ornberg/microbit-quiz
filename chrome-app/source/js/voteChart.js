@@ -1,3 +1,5 @@
+import Chart from 'chart.js'
+
 var chartLabels = [];			// An array of strings. Each datapoint should have a label otherwise they won't show on the chart
 var chartDataLabel = '';			// The 'units of measurement' for example 'number of votes'
 var chartData = [];				// The datapoints of the chart, the number of datapoints should match the number of labels
@@ -51,7 +53,7 @@ function updateType(typeString){
 	Redraws the chart with new chartLabels, chartDataLabel and chartData
 */
 
-function updateChart(newLabels, newLabel, newData, colourArray){
+export function updateChart(newLabels, newLabel, newData, colourArray){
 	updateLabels(newLabels);
 	updateLabel(newLabel);
 	updateData(newData);
@@ -63,7 +65,7 @@ function updateChart(newLabels, newLabel, newData, colourArray){
 	Draws the chart in the canvas with the id 'voteResults'
 */
 
-function drawChart(){
+export function drawChart(){
 	var ctx = document.getElementsByClassName("voteResults")[0];
 	var myChart = new Chart(ctx, {
 		type: chartType,

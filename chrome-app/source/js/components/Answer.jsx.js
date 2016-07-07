@@ -1,16 +1,22 @@
-var Answer = React.createClass({
-  getInitialState: function () {
-    return {
-      desc: this.props.desc,
-      index: this.props.index
-    };
-  },
-  render() {
-    var asciiValue = (65 + this.props.index);
-    if (asciiValue > 90) {
-      //handle more than 26 answers...?
-    }
-    var answerLetter = String.fromCharCode(asciiValue);
-    return <AnswerDisplay editHandler={this.props.editHandler} edit={this.props.edit} desc={this.props.desc} letter={answerLetter}/>;
+import React, { Component } from 'react'
+
+class Answer extends Component {
+  constructor() {
+    super();
   }
-});
+  render() {
+    console.log(this.props.label);
+    var letter = String.fromCharCode(65 + this.props.index);
+    return (
+      <li className="styled-box answer">
+        <div className="answer-letter">
+          <span className={"coloured-" + letter}>{letter}</span>
+        </div>
+          { this.props.edit ? <input readOnly={!this.props.edit} onChange={this.props.answerHandler.bind(null, this.props.index)} value={this.props.label} className="answer-label"/> : <span className="answer-label">{this.props.label}</span> }
+          { this.props.edit ? <div onClick={this.props.deleteAnswerHandler.bind(null, this.props.index)} className="delete-answer">X</div> : null }
+      </li>
+    )
+  }
+}
+
+export default Answer

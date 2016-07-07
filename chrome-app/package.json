@@ -7,16 +7,14 @@
     "babel-preset-react": "^6.11.1",
     "grunt": "^1.0.1",
     "grunt-babel": "^6.0.0",
+    "grunt-browserify": "^5.0.0",
     "grunt-contrib-clean": "^1.0.0",
     "grunt-contrib-copy": "^1.0.0",
     "load-grunt-tasks": "^3.5.0"
   },
   "dependencies": {
     "chart.js": "^2.1.6",
-    "immutable": "^3.8.1",
     "react": "^15.2.0",
-    "react-dom": "^15.2.0",
-    "react-redux": "^4.4.5",
-    "redux": "^3.5.2"
+    "react-dom": "^15.2.0"
   }
 }

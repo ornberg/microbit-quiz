@@ -1,7 +1,7 @@
 //var currentQuiz = new Quiz("Test Quiz");
 var currentQuestion = new qQuestion("Do you like chocolate?", ["Yes", "No", "Hey, who knows", "Maybe", "Pick me if you don't pick another"]);
 
-function Serial(dataCallback)
+export function Serial(dataCallback, connectCallback)
 {
     var connected = false;
     var CONNECTION_INFO = null;
@@ -15,10 +15,11 @@ function Serial(dataCallback)
         serialBuffer.push(data);
         if (data.lastIndexOf(";") > -1) { //full command received
             var response = serialBuffer.join("");
-            parsedResponse = response.split(/[;:]+/);
+            var parsedResponse = response.split(/[;:]+/);
             parsedResponse.pop(); //remove empty index
             if (!connected && parsedResponse[0] === "ack") {
               connected = true;
+              connectCallback(connected);
             }
             dataCallback(parsedResponse);
             serialBuffer = [];
@@ -26,9 +27,10 @@ function Serial(dataCallback)
     }
 
     function onError(err) {
-      if (!(err.error === "device_lost") && !(err.error === "disconnected") && !(err.error === "break"))  
+      if (!(err.error === "device_lost") && !(err.error === "disconnected") && !(err.error === "break"))
         throw new Error(err.error); //unknown error
       connected = false;
+      connectCallback(connected);
     }
 
     function utf8AbFromStr(str)
@@ -50,8 +52,10 @@ function Serial(dataCallback)
     {
         if (CONNECTION_INFO)
         {
-            chrome.serial.send(CONNECTION_INFO.connectionId, utf8AbFromStr(string).buffer, function(info) {
-                console.log(info);
+          console.log(str);
+            chrome.serial.send(CONNECTION_INFO.connectionId, utf8AbFromStr(str).buffer, function(info) {
+                //console.log(info);
+                //if (info.error) ...
             });
         }
     }
@@ -75,12 +79,13 @@ function Serial(dataCallback)
             if (chrome.runtime.lastError) {
               CONNECTION_INFO = null;
               connected = false;
+              connectCallback(connected);
               console.log(chrome.runtime.lastError.message);
               return callback(connected);
             }
             else {
               CONNECTION_INFO = connectionInfo;
-              s.write("ack;");
+              write("ack;");
               setTimeout(function() {
                 if (!connected) {
                   console.log("Connected microbit isn't flashed with the correct program");
@@ -89,12 +94,13 @@ function Serial(dataCallback)
                 else {
                   callback(true);
                 }
-              }, 3000);
+              }, 5000);
             }
           });
         }
         else {
           connected = false;
+          connectCallback(connected);
           callback(false);
         }
       });
@@ -106,16 +112,7 @@ function Serial(dataCallback)
     return {
         "write": function(str)
         {
-            if (CONNECTION_INFO)
-            {
-                chrome.serial.send(CONNECTION_INFO.connectionId, utf8AbFromStr(str).buffer, function(info) {
-                    if (info.error) {
-                        console.log("Error: unable to contact micro:bit");
-                        s = new Serial(dataCallback); //try reinstatiating the serial connection
-                    }
-
-                });
-            }
+            write(str);
         },
         "isConnected": function() {
           return connected;
@@ -186,14 +183,3 @@ function qQuestion(desc, ans)
         },
     }
 }
-
-var s = new Serial(function(data) {
-    if (data[0] === "ans") {
-        currentQuestion.addVote(data[3], data[4]);
-        var cmd = "ack:" + data.join(":").substring(4) + ";"; //always ack even if it's a resubmission
-        s.write(cmd);
-    }
-    else if (data[0] === "ack") {
-      connected = true;
-    }
-});

@@ -3,8 +3,12 @@ module.exports = function(grunt) {
   require('load-grunt-tasks')(grunt); // npm install --save-dev load-grunt-tasks
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-browserify');
   grunt.initConfig({
-    "clean": ['build/**'],
+    "clean": {
+      all: ['build/**'],
+      js: ['build/js/*', '!build/js/all.js', '!build/js/background.js']
+    },
     "copy": {
       main: {
         files: [
@@ -44,8 +48,14 @@ module.exports = function(grunt) {
           ext: '.js'
         }]
       }
+    },
+    "browserify": {
+      js: {
+        src: ["build/js/index.js"],
+        dest: "build/js/all.js"
+      }
     }
   });
-  grunt.registerTask("default", ["clean", "copy", "babel"]);
+  grunt.registerTask("default", ["clean:all", "copy", "babel", "browserify", "clean:js"]);
   //grunt.registerTask("debug", ["clean", "copy", "babel"]);
 };

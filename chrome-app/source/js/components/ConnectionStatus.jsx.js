@@ -1,20 +1,17 @@
-class ConnectionStatus extends React.Component {
+import React, { Component } from 'react'
+
+class ConnectionStatus extends Component {
   constructor() {
     super();
-    this.state = {
-      connected: false
-    };
-    this.handleClick = this.handleClick.bind(this);
-  }
-  handleClick() {
-    this.setState({connected: !this.state.connected});
   }
   render() {
-    const text = s.isConnected() ? 'Your Micro:bit is connected :)' : 'There is no Micro:bit connected :(';
+    let text = this.props.connected ? "Your Micro:bit is connected :)" : "There is no Micro:bit connected :("
     return (
-      <div onClick={this.handleClick}>
+      <div>
         {text}
       </div>
     );
   }
 }
+
+export default ConnectionStatus
