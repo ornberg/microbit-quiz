@@ -6,7 +6,7 @@ var chartData = [];				// The datapoints of the chart, the number of datapoints 
 var chartBackgroundColor = [];	// An array of colours for each datapoint. Automatically generated in the updateData() function
 
 var	chartType = 'bar'; 			// OPTIONS: 'line', 'bar', 'radar', 'polarArea', 'pie', 'doughnut'
-
+var firstFlag = true;
 
 
 /*
@@ -59,6 +59,7 @@ export function updateChart(newLabels, newLabel, newData, colourArray){
 	updateData(newData);
 	updateBackgroundColor(colourArray);
 	drawChart();
+	firstFlag = false;
 }
 
 /*
@@ -79,6 +80,7 @@ export function drawChart(){
 			}]
 		},
 		options: {
+			animation: firstFlag,
 			responsive: true,
 			scales: {
 				yAxes: [{
