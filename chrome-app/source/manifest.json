@@ -8,6 +8,5 @@
 			"scripts" : ["js/background.js"]
 		}
 	},
-  "icons" : { "16": "quizbit-16.png", "128": "quizbit-128.png" },
 	"permissions" : [ "serial", "storage", "unlimitedStorage"]
 }

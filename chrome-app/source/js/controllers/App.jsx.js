@@ -1,3 +1,4 @@
+import update from 'react-addons-update'
 import React, { Component } from 'react'
 import ConnectionStatus from '../components/ConnectionStatus'
 import AppButton from '../components/AppButton'
@@ -149,9 +150,9 @@ class App extends Component {
               newAnswerHandler={this.newAnswer.bind(this)}
             />
             <VoteCounter votes={this.state.votes}/>
-            <AppButton active={!this.state.editing} text="Show Results" handleClick={this.setPage.bind(this, "results")}/>
-            <AppButton active={!this.state.voting} text={this.state.editing ? "Stop Editing" : "Edit Question"} handleClick={this.toggleEdit.bind(this)}/>
-            <AppButton active={!this.state.editing && this.state.mbConnected} text={this.state.voting ? "Stop Vote" : "Start Vote"} classNames={this.state.voting ? "stop-btn" : "start-btn"} handleClick={this.toggleVote.bind(this)}/>
+            <AppButton active={!this.state.editing} text="Show Results" classNames="animated" handleClick={this.setPage.bind(this, "results")}/>
+            <AppButton active={!this.state.voting} text={this.state.editing ? "Stop Editing" : "Edit Question"} classNames="animated" handleClick={this.toggleEdit.bind(this)}/>
+            <AppButton active={!this.state.editing && this.state.mbConnected} text={this.state.voting ? "Stop Vote" : "Start Vote"} classNames={this.state.voting ? "stop-btn animated" : "start-btn animated"} handleClick={this.toggleVote.bind(this)}/>
           </div>
         break;
       case "results":

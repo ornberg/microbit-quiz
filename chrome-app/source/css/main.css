@@ -97,6 +97,11 @@ ul {
   transition:background-color 0.2s;
 }
 
+.delete-answer-symbol:hover {
+	background-color: #F08099;
+	transform: scale(0.95);
+}
+
 .answer-box {
   display: flex;
   flex-direction: row;
@@ -144,11 +149,19 @@ ul {
   font-size: 20px;
 }
 
+input.answer-label:hover {
+    border-color: grey;
+}
+
 .question-title {
   width:100%;
   text-align:center;
   font-size: 52px;
   font-weight: normal;
+}
+
+.question-title:hover {
+  border-color: grey;
 }
 
 .question-box {
@@ -166,6 +179,14 @@ ul {
   font-weight: normal;
   border-radius: 3px;
   text-align: center;
+}
+
+.add-answer:hover {
+  border-color: grey;
+}
+
+.add-answer:active {
+  transform: scale(0.97);
 }
 
 .add-answer-symbol {
@@ -190,6 +211,15 @@ ul {
   transition: transform 0.2s;
 }
 
+.btn:hover:not(:disabled) {
+  transform: scale(1.03);
+}
+
+.btn:hover:not(:disabled):not(.start-btn):not(.stop-btn) {
+  color: #636161;
+  background-color: #f1f1f1;
+}
+
 .btn:active:not(:disabled) {
   transform: scale(0.97);
 }
@@ -202,10 +232,6 @@ ul {
 
 .start-btn {
   background-color: #1ACB7C;
-  color: white;
-}
-
-.start-btn:hover, .start-btn:active {
   color: white;
 }
 
@@ -229,4 +255,12 @@ input[readonly] {
 
 .styled-box input {
   width: 150px;
+}
+
+.animated {
+	-webkit-transition: all .5s ease;
+    -moz-transition: all .5s ease;
+    -o-transition: all .5s ease;
+    -ms-transition: all .5s ease;
+    transition: all .5s ease;
 }
