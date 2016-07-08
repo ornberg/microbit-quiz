@@ -14,7 +14,7 @@ class App extends Component {
       voting: false,
       editing: false,
       votes: 0,
-      hasMicrobit: false,
+      mbConnected: false,
       page: "question",
       question: "Do you like chocolate?",
       answers: ["Yes", "No", "Maybe", "No answer"],
@@ -32,7 +32,7 @@ class App extends Component {
 
     window.serial = new Serial(
       (data) => {
-        if (data[0] === "ans") {
+        if (data[0] === "ans" && this.state.voting) {
           if (typeof self.state.voters[data[3]] === 'undefined') {
             var microbitId = data[3];
             var answerId = parseInt(data[4]);
@@ -47,12 +47,15 @@ class App extends Component {
         }
       },
       (connected) => {
-        self.setState({hasMicrobit: connected});
+        self.setState({mbConnected: connected});
         if (!connected) {
-          //poll for a new micro:bit connection
+          //cancel any current vote
+          if (this.state.voting)
+            this.toggleVote();
           setTimeout(function() {
+            //poll for a new micro:bit connection
             window.serial.reconnect(function() {});
-          });
+          }, 1000);
         }
     });
   }
@@ -88,13 +91,13 @@ class App extends Component {
           window.sendTimer = setInterval(
             function() {
               window.serial.write("set:ABCD:" + this.state.questionId + ":" + this.state.answers.length + ";");
-              //stop bursts when we stop voting
-              if (!this.state.voting) {
-                clearInterval(sendTimer);
-              }
             }.bind(this), 3000
           );
       });
+    }
+    else {
+      //stop bursts when we stop voting
+      clearInterval(sendTimer);
     }
   }
 
@@ -149,7 +152,7 @@ class App extends Component {
             <VoteCounter votes={this.state.votes}/>
             <AppButton active={!this.state.editing} text="Show Results" handleClick={this.setPage.bind(this, "results")}/>
             <AppButton active={!this.state.voting} text={this.state.editing ? "Stop Editing" : "Edit Question"} handleClick={this.toggleEdit.bind(this)}/>
-            <AppButton active={!this.state.editing} text={this.state.voting ? "Stop Vote" : "Start Vote"} classNames={this.state.voting ? "stop-btn" : "start-btn"} handleClick={this.toggleVote.bind(this)}/>
+            <AppButton active={!this.state.editing && this.state.mbConnected} text={this.state.voting ? "Stop Vote" : "Start Vote"} classNames={this.state.voting ? "stop-btn" : "start-btn"} handleClick={this.toggleVote.bind(this)}/>
           </div>
         break;
       case "results":
@@ -165,7 +168,7 @@ class App extends Component {
     }
     return (
       <div>
-        <ConnectionStatus connected={this.state.hasMicrobit}/>
+        <ConnectionStatus connected={this.state.mbConnected}/>
         {page}
       </div>
     );
