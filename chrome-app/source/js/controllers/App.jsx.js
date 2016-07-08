@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import update from 'react-addons-update'
 import ConnectionStatus from '../components/ConnectionStatus'
 import AppButton from '../components/AppButton'
 import ChartPage from '../components/ChartPage'
