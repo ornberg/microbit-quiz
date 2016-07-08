@@ -10,7 +10,6 @@ import { Serial } from '../main.js'
 class App extends Component {
   constructor(props) {
     super(props)
-    this.handleRefreshClick = this.handleRefreshClick.bind(this)
     this.state = {
       voting: false,
       editing: false,
