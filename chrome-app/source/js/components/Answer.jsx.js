@@ -13,7 +13,7 @@ class Answer extends Component {
           <span className={"coloured-" + letter}>{letter}</span>
         </div>
           { this.props.edit ? <input readOnly={!this.props.edit} onChange={this.props.answerHandler.bind(null, this.props.index)} value={this.props.label} className="answer-label"/> : <span className="answer-label">{this.props.label}</span> }
-          { this.props.edit ? <div onClick={this.props.deleteAnswerHandler.bind(null, this.props.index)} className="delete-answer">X</div> : null }
+          { this.props.edit ? <div onClick={this.props.deleteAnswerHandler.bind(null, this.props.index)} className="delete-answer"><div className="delete-answer-symbol"></div></div> : null }
       </li>
     )
   }

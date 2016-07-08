@@ -5,11 +5,8 @@ class ConnectionStatus extends Component {
     super();
   }
   render() {
-    let text = this.props.connected ? "Your Micro:bit is connected :)" : "There is no Micro:bit connected :("
     return (
-      <div>
-        {text}
-      </div>
+      <div className={"connection-status " + (this.props.connected ? "connected" : "disconnected")}></div>
     );
   }
 }
