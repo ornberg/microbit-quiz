@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { updateChart, drawChart } from '../voteChart'
+import { updateChart, runChart } from '../voteChart'
 
 class ChartPage extends Component {
   constructor() {
@@ -13,8 +13,12 @@ class ChartPage extends Component {
     ];
   }
   componentDidMount() {
-    drawChart();
-    updateChart(this.props.answers, ["Measurement"], this.props.votes, this.letterColours);
+    runChart();
+    updateChart(this.props.answers, this.props.votes, this.letterColours);
+    window.chartTimer = setInterval(function() { updateChart(this.props.answers, this.props.votes, this.letterColours); }.bind(this), 2000);
+  }
+  componentWillUnmount() {
+    clearInterval(window.chartTimer);
   }
   render() {
     return (

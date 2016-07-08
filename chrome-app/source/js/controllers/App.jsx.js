@@ -26,38 +26,36 @@ class App extends Component {
   }
   componentDidMount() {
     var self = this;
-    window.serial = new Serial(function(data) {
-      if (data[0] === "ans") {
-        if (typeof self.state.voters[data[3]] === 'undefined') {
-          var microbitId = data[3];
-          var answerId = parseInt(data[4]);
-          self.setState({
-            votes: self.state.votes+1,
-            voters: update(self.state.voters, {[microbitId]: { $set: true}}),
-            answerCounts: update(self.state.answerCounts, {[answerId]: { $set: (self.state.answerCounts[parseInt(answerId)]+1)}})
+
+    //Create a new serial connection manager, takes two functions:
+      //1. called when data is received
+      //2. called when the microbit connection state changes
+
+    window.serial = new Serial(
+      (data) => {
+        if (data[0] === "ans") {
+          if (typeof self.state.voters[data[3]] === 'undefined') {
+            var microbitId = data[3];
+            var answerId = parseInt(data[4]);
+            self.setState({
+              votes: self.state.votes+1,
+              voters: update(self.state.voters, {[microbitId]: { $set: true}}),
+              answerCounts: update(self.state.answerCounts, {[answerId]: { $set: (self.state.answerCounts[parseInt(answerId)]+1)}})
+            });
+          }
+          var cmd = "ack:" + data.join(":").substring(4) + ";"; //always ack even if it's a resubmission
+          window.serial.write(cmd);
+        }
+      },
+      (connected) => {
+        self.setState({hasMicrobit: connected});
+        if (!connected) {
+          //poll for a new micro:bit connection
+          setTimeout(function() {
+            window.serial.reconnect(function() {});
           });
         }
-        var cmd = "ack:" + data.join(":").substring(4) + ";"; //always ack even if it's a resubmission
-        //console.log(cmd);
-        window.serial.write(cmd);
-        //console.log(self.state.answerCounts);
-      }
-    },
-    function(connected) {
-      self.setState({hasMicrobit: connected});
-      if (!connected) {
-        setTimeout(function() {
-          window.serial.reconnect(function() {});
-        });
-      }
     });
-  }
-
-  componentWillReceiveProps(nextProps) {
-    /*if (nextProps.selectedSubreddit !== this.props.selectedSubreddit) {
-      const { dispatch, selectedSubreddit } = nextProps
-      dispatch(fetchPostsIfNeeded(selectedSubreddit))
-    }*/
   }
 
   setPage(page) {
@@ -73,19 +71,30 @@ class App extends Component {
   }
 
   toggleVote() {
-    let newState = !this.state.voting;
+    let startingNewVote = !this.state.voting;
     this.setState({
       voting: !this.state.voting
     })
 
-    if (newState) {
+    if (startingNewVote) {
+      //reset any vote-related state
       this.setState({
         questionId: this.state.questionId+1,
         votes: 0,
         voters: {},
         answerCounts: Array.apply(null, Array(this.state.answers.length)).map(function() { return 0 })
       }, function() {
+          //AFTER the new state transaction finishes, start bursting set signals
           window.serial.write("set:ABCD:" + this.state.questionId + ":" + this.state.answers.length + ";");
+          window.sendTimer = setInterval(
+            function() {
+              window.serial.write("set:ABCD:" + this.state.questionId + ":" + this.state.answers.length + ";");
+              //stop bursts when we stop voting
+              if (!this.state.voting) {
+                clearInterval(sendTimer);
+              }
+            }.bind(this), 3000
+          );
       });
     }
   }
@@ -98,11 +107,10 @@ class App extends Component {
     })
   }
 
-  deleteAnswer(index, event, evt) {
+  deleteAnswer(index, event) {
     if (this.state.answers.length <= 2) {
       return; //minimum of two answers
     }
-    console.log(event, evt);
     var self = this;
     this.setState({
       answers: update(self.state.answers, { $splice: [[index, 1]]})
@@ -117,22 +125,10 @@ class App extends Component {
     })
   }
 
-  addAnswer(index, event) {
-
-  }
-
   setQuestion(event) {
     this.setState({
       question: event.target.value
     });
-  }
-
-  handleRefreshClick(e) {
-    /*e.preventDefault()
-
-    const { dispatch, selectedSubreddit } = this.props
-    dispatch(invalidateSubreddit(selectedSubreddit))
-    dispatch(fetchPostsIfNeeded(selectedSubreddit))*/
   }
 
   render() {
@@ -152,7 +148,7 @@ class App extends Component {
               newAnswerHandler={this.newAnswer.bind(this)}
             />
             <VoteCounter votes={this.state.votes}/>
-            <AppButton active={!this.state.voting && !this.state.editing} text="Show Results" handleClick={this.setPage.bind(this, "results")}/>
+            <AppButton active={!this.state.editing} text="Show Results" handleClick={this.setPage.bind(this, "results")}/>
             <AppButton active={!this.state.voting} text={this.state.editing ? "Stop Editing" : "Edit Question"} handleClick={this.toggleEdit.bind(this)}/>
             <AppButton active={!this.state.editing} text={this.state.voting ? "Stop Vote" : "Start Vote"} classNames={this.state.voting ? "stop-btn" : "start-btn"} handleClick={this.toggleVote.bind(this)}/>
           </div>
@@ -175,26 +171,6 @@ class App extends Component {
       </div>
     );
   }
-}
-
-function mapStateToProps(state) {
-  /*const { selectedSubreddit, postsBySubreddit } = state
-  const {
-    isFetching,
-    lastUpdated,
-    items: posts
-  } = postsBySubreddit[selectedSubreddit] || {
-    isFetching: true,
-    items: []
-  }
-
-  return {
-    selectedSubreddit,
-    posts,
-    isFetching,
-    lastUpdated
-  }*/
-  return state;
 }
 
 export default App

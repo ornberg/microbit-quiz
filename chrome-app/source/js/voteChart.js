@@ -15,7 +15,7 @@ var myChart;
 */
 
 export function runChart(){
-	ctx = document.getElementById("voteResults");
+	ctx = document.getElementsByClassName("voteResults")[0];
 	myChart = new Chart(ctx, {
 		type: chartType,
 		data: {
