@@ -46,6 +46,10 @@ body {
   justify-content: center;
 }
 
+h1 {
+  margin-top: 0;
+}
+
 .wrapper {
   width: 100%;
   margin: 5%;
@@ -64,6 +68,11 @@ body {
   align-self: flex-end;
 }
 
+.vote-results {
+  width: 100%;
+  height: 100%
+}
+
 ul {
   list-style: none;
 }
@@ -78,7 +87,7 @@ ul {
 .vote-box {
   float: left;
   width: 75px;
-  height: 75px;
+  height: 65px;
   padding: 10px;
 }
 
@@ -89,6 +98,7 @@ ul {
 }
 
 .vote-box > p {
+  margin-top: 0;
   font-size: 14px;
 }
 
@@ -225,7 +235,7 @@ input.answer-label:hover {
   font-family: "OpenSans-Semibold";
   transition: transform 0.1s;
   float: right;
-  margin-top: 55px;
+  margin-top: 45px;
 }
 
 .btn:hover:not(:disabled) {
@@ -277,4 +287,24 @@ input[readonly] {
 
 .animated {
   transition: all 0.1s ease;
+}
+
+.connection-status {
+  width: 50px;
+  height: 18px;
+  position: absolute;
+  left: 100%;
+  margin-left: -70px;
+  margin-top: 15px;
+}
+
+.connected {
+  -webkit-mask-image: url('img/connected.svg');
+  background-color: rgba(0, 209, 143, 0.35);
+
+}
+
+.disconnected {
+  -webkit-mask-image: url('img/disconnected.svg');
+  background-color: rgba(142, 45, 45, 0.35);
 }

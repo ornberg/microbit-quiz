@@ -9,7 +9,13 @@ class ChartPage extends Component {
       "#00AFD1",
       '#00D18F',
       "#FBC45B",
-      "#CEA2FB"
+      "#CEA2FB",
+      "#d8607b",
+      "#80a7e0",
+      "#4bc0c0",
+      "#faa376",
+      "#8875b0",
+      "#f0b1d8"
     ];
   }
   componentDidMount() {
@@ -22,7 +28,7 @@ class ChartPage extends Component {
   }
   render() {
     return (
-      <div>
+      <div className="vote-results">
         <h1 className="question-title">Results</h1>
         <canvas className="voteResults"></canvas>
       </div>

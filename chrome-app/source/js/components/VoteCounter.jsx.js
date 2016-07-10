@@ -8,7 +8,7 @@ class VoteCounter extends Component {
     return (
       <div className="styled-box vote-box">
         <span>{this.props.votes}</span>
-        <p>Votes In</p>
+        <p>votes in</p>
       </div>
     );
   }
