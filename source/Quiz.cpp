@@ -26,7 +26,7 @@ DEALINGS IN THE SOFTWARE.
 #include "MicroBit.h"
 #include "MicroBitQuiz.h"
 
-#ifdef MICROBIT_SAMPLE_VOTER_STUDENT
+#ifdef MICROBIT_QUIZ_QUIZZER
 
 MicroBit uBit;
 
@@ -49,14 +49,22 @@ int alternatives;
 // Number of the letter displayed so that char letter = 32 + letterNumber
 int letterNumber;
 
-//
+// Answer sent to quizmaster for validation when ack is received
 ManagedString answer;
 
-// The image of a tick
-MicroBitImage tickImage("0,0,0,0,0\n0,0,0,0,1\n0,0,0,1,0\n1,0,1,0,0\n0,1,0,0,0\n");
+MicroBitImage tickImage("\
+  000,000,000,000,000\n\
+  000,000,000,000,255\n\
+  000,000,000,255,000\n\
+  255,000,255,000,000\n\
+  000,255,000,000,000\n");
 
-// The image of a cross
-MicroBitImage crossImage("1,0,0,0,1\n0,1,0,1,0\n0,0,1,0,0\n0,1,0,1,0\n1,0,0,0,1\n");
+MicroBitImage crossImage("\
+  255,000,000,000,255\n\
+  000,255,000,255,000\n\
+  000,000,255,000,000\n\
+  000,255,000,255,000\n\
+  255,000,000,000,255\n");
 
 MicroBitImage smileyImage("\
   000,255,000,255,000\n\
@@ -68,10 +76,9 @@ MicroBitImage smileyImage("\
 
 /*
   This method triggers when a datagram is received.
-  The three expected messages are:
+  The two expected messages are:
   A) "set:<quizID>:<questionID>:<alternatives>;"
   B) "ack:<quizID>:<questionID>:<serial>:<answer>;"
-  C) "stp;"
 */
 
 void onData(MicroBitEvent) {
@@ -106,16 +113,15 @@ void onData(MicroBitEvent) {
 
   else if (message == ("ack:" + answer)) {
     connectedFlag = 1;
-  } else if (message == "stp;"){
-    uBit.display.scrollAsync("FINISHED!");
   }
 }
 
 
 /*
 	This method triggers when a button is clicked.
-	A and B are used to navigate between the available answers, AB is used to
-	send the answer currently appearing on the screen and then display the 'tick' image.
+	A and B are used to navigate between the available answers, A+B is used to
+	send the answer currently appearing on the screen and then display the 'tick' image
+  upon receiving an acknowledgement that the answer has been received.
 */
 
 bool connecting = 0; //if currently sending anwser, ignore other button presses
