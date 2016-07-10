@@ -139,7 +139,7 @@ class App extends Component {
     switch(this.state.page) {
       case "question":
         page =
-          <div>
+          <div className="wrapper">
             <Question
               edit={this.state.editing}
               title={this.state.question}
@@ -149,15 +149,17 @@ class App extends Component {
               deleteAnswerHandler={this.deleteAnswer.bind(this)}
               newAnswerHandler={this.newAnswer.bind(this)}
             />
-            <VoteCounter votes={this.state.votes}/>
-            <AppButton active={!this.state.editing} text="Show Results" classNames="animated" handleClick={this.setPage.bind(this, "results")}/>
-            <AppButton active={!this.state.voting} text={this.state.editing ? "Stop Editing" : "Edit Question"} classNames="animated" handleClick={this.toggleEdit.bind(this)}/>
-            <AppButton active={!this.state.editing && this.state.mbConnected} text={this.state.voting ? "Stop Vote" : "Start Vote"} classNames={this.state.voting ? "stop-btn animated" : "start-btn animated"} handleClick={this.toggleVote.bind(this)}/>
+            <div className="bottom-container">
+              <VoteCounter votes={this.state.votes}/>
+              <AppButton active={!this.state.editing} text="Show Results" classNames="animated" handleClick={this.setPage.bind(this, "results")}/>
+              <AppButton active={!this.state.voting} text={this.state.editing ? "Stop Editing" : "Edit Question"} classNames="animated" handleClick={this.toggleEdit.bind(this)}/>
+              <AppButton active={!this.state.editing && this.state.mbConnected} text={this.state.voting ? "Stop Vote" : "Start Vote"} classNames={this.state.voting ? "stop-btn animated" : "start-btn animated"} handleClick={this.toggleVote.bind(this)}/>
+            </div>
           </div>
         break;
       case "results":
         page =
-          <div>
+          <div className="wrapper">
             <ChartPage answers={this.state.answers} votes={this.state.answerCounts}/>
             <AppButton active={true} text="Return" handleClick={this.setPage.bind(this, "question")}/>
           </div>

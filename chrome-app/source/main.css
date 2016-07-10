@@ -33,14 +33,35 @@ html { /* Smoothens edges of fonts */
 
 body {
   color: #4c4c4c;
-  margin: 5%;
+  margin: 0;
   background-color: #EDEDED;
   background-color: #ededed;
   font-family: "OpenSans-Regular";
-  transition: all 0.5s ease-in-out;
 }
 
-#app-frame {
+#app-frame, #app-frame > div  {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.wrapper {
+  width: 100%;
+  margin: 5%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.question-box {
+  text-align: center;
+  flex-grow: 1;
+}
+
+.bottom-container {
+  width: 100%;
+  align-self: flex-end;
 }
 
 ul {
@@ -164,11 +185,6 @@ input.answer-label:hover {
   border-color: grey;
 }
 
-.question-box {
-  text-align: center;
-  margin: 50px;
-}
-
 .add-answer {
   width: 244px;
   height: 55px;
@@ -201,27 +217,29 @@ input.answer-label:hover {
 }
 
 .btn {
-  float: right;
   height: 40px;
   border: none !important;
   font-size: 14px;
   color: grey;
   margin: 5px;
   font-family: "OpenSans-Semibold";
-  transition: transform 0.2s;
+  transition: transform 0.1s;
+  float: right;
+  margin-top: 55px;
 }
 
 .btn:hover:not(:disabled) {
-  transform: scale(1.03);
+  transform: scale(1.05);
 }
 
 .btn:hover:not(:disabled):not(.start-btn):not(.stop-btn) {
   color: #636161;
   background-color: #f1f1f1;
+  cursor: pointer;
 }
 
 .btn:active:not(:disabled) {
-  transform: scale(0.97);
+  transform: scale(0.95);
 }
 
 .btn:disabled {
@@ -258,9 +276,5 @@ input[readonly] {
 }
 
 .animated {
-	-webkit-transition: all .5s ease;
-    -moz-transition: all .5s ease;
-    -o-transition: all .5s ease;
-    -ms-transition: all .5s ease;
-    transition: all .5s ease;
+  transition: all 0.1s ease;
 }

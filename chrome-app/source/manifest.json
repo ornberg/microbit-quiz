@@ -8,5 +8,6 @@
 			"scripts" : ["js/background.js"]
 		}
 	},
+  "icons": { "128": "img/icon-128.png" },
 	"permissions" : [ "serial", "storage", "unlimitedStorage"]
 }
