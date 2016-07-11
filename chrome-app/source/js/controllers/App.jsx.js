@@ -161,7 +161,7 @@ class App extends Component {
         page =
           <div className="wrapper">
             <ChartPage answers={this.state.answers} votes={this.state.answerCounts}/>
-            <AppButton active={true} text="Return" handleClick={this.setPage.bind(this, "question")}/>
+            <AppButton active={true} text="Return" classNames="fixed-return-btn" handleClick={this.setPage.bind(this, "question")}/>
           </div>
         break;
       default:
