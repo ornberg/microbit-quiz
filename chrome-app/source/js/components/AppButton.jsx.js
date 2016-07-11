@@ -5,6 +5,8 @@ class AppButton extends Component {
     super();
   }
   render() {
+    if (typeof this.props.classNames === 'undefined')
+      this.props.classNames = "";
     return (
       <button className={"styled-box btn " + this.props.classNames} disabled={!this.props.active} onClick={this.props.handleClick}>{this.props.text}</button>
     );
