@@ -26,7 +26,7 @@ DEALINGS IN THE SOFTWARE.
 #include "MicroBit.h"
 #include "MicroBitQuiz.h"
 
-#ifdef MICROBIT_QUIZ_QUIZMASTER
+#ifdef MICROBIT_SAMPLE_VOTER_TEACHER
 
 MicroBit uBit;
 
@@ -50,6 +50,81 @@ MicroBitImage radio(radio_waves);
 
 
 /*
+  Sets up the session ID, the number of the questionID and the number of answers based on a serial message,
+  then send it out to the listening micro:bits
+  ex.: incoming == "set:ABCD:1:4;"
+*/
+
+void set(ManagedString incoming) {
+  uBit.display.animateAsync(radio, 500, 5, 0, 0);
+  uBit.radio.datagram.send(incoming);
+}
+
+
+/*
+  Sends the received answer from a micro:bit through the serial line
+  example: incoming == "ans:ABCD:1:012345689:2;"
+*/
+
+void ans(ManagedString incoming) {
+  uBit.serial.send(incoming);
+}
+
+
+/*
+  Sends back an acknowledgement received through the serial line to the other micro:bits as a datagram
+  example: income == "ack:ABCD:1:012345689:2;"
+*/
+
+void ack(ManagedString incoming) {
+  uBit.radio.datagram.send(incoming);
+}
+
+
+/*
+  Broadcast a kill signal to the micro:bits
+*/
+
+void stp() {
+  uBit.radio.datagram.send("stp;");
+}
+
+
+/*
+  Displays the session ID on the LED display
+*/
+
+void displayQuizID() {
+  uBit.display.print(quizID);
+  uBit.sleep(1000);
+  uBit.display.clear();
+}
+
+
+/*
+  Displays the number of the current question on the LED display
+*/
+
+void displayQuestionID() {
+  uBit.display.print(questionID);
+  uBit.sleep(1000);
+  uBit.display.clear();
+}
+
+
+/*
+  Displays the number of possible answers for the current question on the LED display
+*/
+
+void displayAlternatives() {
+  uBit.display.print(alternatives);
+  uBit.sleep(1000);
+  uBit.display.clear();
+}
+
+
+
+/*
   Sends any received 'ans' datagrams through the serial line
 */
 
@@ -57,7 +132,7 @@ void onData(MicroBitEvent) {
   ManagedString message = uBit.radio.datagram.recv();
 
   if (message.substring(0,3) == "ans")
-    uBit.serial.send(incoming);
+    ans(message);
 }
 
 /*
@@ -66,31 +141,20 @@ void onData(MicroBitEvent) {
 */
 
 void onButton(MicroBitEvent e) {
-  if (questionID) {
-    if (e.source == MICROBIT_ID_BUTTON_A) {
-
-      uBit.display.print(quizID);
-      uBit.sleep(1000);
-      uBit.display.clear();
-
-      uBit.display.print(questionID);
-      uBit.sleep(1000);
-      uBit.display.clear();
-
-      uBit.display.print(alternatives);
-      uBit.sleep(1000);
-      uBit.display.clear();
-    }
-
-    if (e.source == MICROBIT_ID_BUTTON_B) {
-      uBit.serial.send("nxt;");
-      uBit.display.print(">");
-      uBit.sleep(500);
-      uBit.display.clear();
-    }
-
-    uBit.sleep(20);
+  if (e.source == MICROBIT_ID_BUTTON_A){
+    displayQuizID();
+    displayQuestionID();
+    displayAlternatives();
   }
+
+  if (e.source == MICROBIT_ID_BUTTON_B){
+    uBit.serial.send("nxt;");
+    uBit.display.print(">");
+    uBit.sleep(500);
+    uBit.display.clear();
+  }
+
+  uBit.sleep(20);
 }
 
 
@@ -105,13 +169,13 @@ void reader() {
 
         if (id == "set"){
             uBit.serial.send("ack;");
-            uBit.display.animateAsync(radio, 500, 5, 0, 0);
-            uBit.radio.datagram.send(incoming);
-        }
-
-        else if (id == "ack") {
+            set(incoming);
+        } else if (id == "ack") {
             uBit.serial.send("ack;");
-            uBit.radio.datagram.send(incoming);
+            ack(incoming);
+        } else if (id == "stp") {
+            uBit.serial.send("ack;");
+            stp();
         }
     }
 }
@@ -124,8 +188,8 @@ int main() {
 
   // Initialise the micro:bit listeners for radio datagrams and button events.
   uBit.messageBus.listen(MICROBIT_ID_RADIO, MICROBIT_RADIO_EVT_DATAGRAM, onData);
-  uBit.messageBus.listen(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_CLICK, onButton, MESSAGE_BUS_LISTENER_DROP_IF_BUSY);
-  uBit.messageBus.listen(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_CLICK, onButton, MESSAGE_BUS_LISTENER_DROP_IF_BUSY);
+  uBit.messageBus.listen(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_CLICK, onButton);
+  uBit.messageBus.listen(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_CLICK, onButton);
 
   // Sets the group to an arbitrary number (59 in this case) to avoid interference
   uBit.radio.setGroup(59);
