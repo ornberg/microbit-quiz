@@ -9,7 +9,7 @@ class Question extends Component {
   render() {
     console.log(this.props.answers);
     var answers = this.props.answers.map(function(ans, index) {
-			return <Answer deleteAnswerHandler={this.props.deleteAnswerHandler} edit={this.props.edit} answerHandler={this.props.answerHandler} key={index} index={index} label={ans}/>;
+			return <Answer deleteAnswerHandler={this.props.deleteAnswerHandler} edit={this.props.edit} canDelete={this.props.answers.length > 2} answerHandler={this.props.answerHandler} key={index} index={index} label={ans}/>;
 		}, this);
     console.log(this.props.question);
     return (
