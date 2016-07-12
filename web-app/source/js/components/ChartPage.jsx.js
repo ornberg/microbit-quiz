@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { updateChart, runChart } from '../voteChart'
 
 class ChartPage extends Component {
+
   constructor() {
     super();
     this.letterColours = [
@@ -18,14 +19,17 @@ class ChartPage extends Component {
       "#f0b1d8"
     ];
   }
+
   componentDidMount() {
     runChart();
     updateChart(this.props.answers, this.props.votes, this.letterColours);
     window.chartTimer = setInterval(function() { updateChart(this.props.answers, this.props.votes, this.letterColours); }.bind(this), 2000);
   }
+
   componentWillUnmount() {
     clearInterval(window.chartTimer);
   }
+
   render() {
     return (
       <div className="vote-results">
@@ -34,6 +38,12 @@ class ChartPage extends Component {
       </div>
     );
   }
+
+}
+
+ChartPage.propTypes = {
+  answers:    React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
+  votes:      React.PropTypes.arrayOf(React.PropTypes.number).isRequired
 }
 
 export default ChartPage

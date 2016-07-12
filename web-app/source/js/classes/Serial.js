@@ -1,7 +1,4 @@
-//var currentQuiz = new Quiz("Test Quiz");
-var currentQuestion = new qQuestion("Do you like chocolate?", ["Yes", "No", "Hey, who knows", "Maybe", "Pick me if you don't pick another"]);
-
-export function Serial(dataCallback, connectCallback)
+function Serial(dataCallback, connectCallback)
 {
     var connected = false;
     var CONNECTION_INFO = null;
@@ -126,60 +123,4 @@ export function Serial(dataCallback, connectCallback)
 
 }
 
-
-function qQuiz(name)
-{
-    var name;
-    var id = "ABCD";
-    var questions = [];
-
-    return {
-        "addQuestion": function(q) {
-            if (q.constructor.name != "Question")
-                throw new Error("");
-            else
-                questions.add(q);
-        },
-        "start": function() {
-
-        }
-    }
-}
-
-function qQuestion(desc, ans)
-{
-    var answers = [];
-    var votes = {
-        "count": 0
-    };
-    var quizName = name;
-
-    for (var i = 0; i < ans.length; i++)
-        answers.push({desc: ans[i], count: 0});
-
-    return {
-        "addVote": function(microbitId, answerId) {
-            if (typeof votes[microbitId] === "undefined") {
-                votes[microbitId] = true;
-                answers[answerId].count++;
-                votes.count++;
-            }
-        },
-        "getDesc": function() {
-            return desc;
-        },
-        "getVoteCount": function() {
-            return votes.count;
-        },
-        "getAnswerList": function() {
-            return answers.map(function(ans) {
-                return ans.desc;
-            });
-        },
-        "getAnswerCounts": function() {
-            return answers.map(function(ans) {
-                return ans.count;
-            });
-        },
-    }
-}
+export default Serial

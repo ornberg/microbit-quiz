@@ -3,3 +3,5 @@ yotta_targets
 yotta_modules
 .DS_Store
 node_modules
+nwjsBuild
+nwjsCache

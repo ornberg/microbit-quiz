@@ -4,6 +4,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-browserify');
+  grunt.loadNpmTasks('grunt-nw-builder');
   grunt.initConfig({
     "clean": {
       all: ['build/**'],
@@ -32,6 +33,10 @@ module.exports = function(grunt) {
                 ],
             dest: 'build/js/lib/'},
         ]
+      },
+      pkg: {
+        src: ["./package.json"],
+        dest: 'build/package.json'
       }
     },
     "babel": {
@@ -44,7 +49,7 @@ module.exports = function(grunt) {
           expand: true,
           cwd: 'source/js',
           src: ["**/*.js", '!lib/**'],
-          dest: 'build/js', // Custom folder
+          dest: 'build/js',
           ext: '.js'
         }]
       }
@@ -54,8 +59,18 @@ module.exports = function(grunt) {
         src: ["build/js/index.js"],
         dest: "build/js/all.js"
       }
+    },
+    nwjs: {
+      options: {
+          platforms: ['win64','osx64'],
+          macIcns: './source/img/icon-128.icns',
+          buildDir: './nwjsBuild',
+          cacheDir: './nwjsCache'
+      },
+      src: ['./build/**/*']
     }
   });
-  grunt.registerTask("default", ["clean:all", "copy", "babel", "browserify", "clean:js"]);
-  //grunt.registerTask("debug", ["clean", "copy", "babel"]);
+  var tasks = ["clean:all", "copy", "babel", "browserify", "clean:js"];
+  grunt.registerTask("default", tasks);
+  grunt.registerTask("build-with-nwjs", tasks.concat("nwjs"));
 };
