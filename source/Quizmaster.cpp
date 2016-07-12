@@ -57,7 +57,7 @@ void onData(MicroBitEvent) {
   ManagedString message = uBit.radio.datagram.recv();
 
   if (message.substring(0,3) == "ans")
-    uBit.serial.send(incoming);
+    uBit.serial.send(message);
 }
 
 /*
