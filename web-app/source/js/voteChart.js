@@ -9,49 +9,48 @@ var	chartType = 'bar'; 			// OPTIONS: 'line', 'bar', 'radar', 'polarArea', 'pie'
 var ctx;
 var myChart;
 
-
 /*
-	Initialises the chart
+Initialises the chart
 */
 
-export function runChart(){
-	ctx = document.getElementsByClassName("voteResults")[0];
-	myChart = new Chart(ctx, {
-		type: chartType,
-		data: {
-			labels: chartLabels,
-			datasets: [{
-				label: '',
-				data: chartData,
-				backgroundColor: chartBackgroundColor,
-				borderWidth: 1
-			}]
-		},
-		options: {
-			responsive: true,
-			scales: {
-				yAxes: [{
-					ticks: {
-						beginAtZero:true,
-						stepSize: 1
-					}
-				}]
-			},
-			legend: {
-				display: false
-			}
-		}
-	});
-	updateChart([], [], []);
+export function runChart() {
+  ctx = document.getElementsByClassName("voteResults")[0];
+  myChart = new Chart(ctx, {
+    type: chartType,
+    data: {
+      labels: chartLabels,
+      datasets: [{
+        label: '',
+        data: chartData,
+        backgroundColor: chartBackgroundColor,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        yAxes: [{
+          ticks: {
+            beginAtZero:true,
+            stepSize: 1
+          }
+        }]
+      },
+      legend: {
+        display: false
+      }
+    }
+  });
+  updateChart([], [], []);
 }
 
 /*
-	Redraws the chart with new chartLabels, chartDataLabel, chartData and background colour
+Redraws the chart with new chartLabels, chartDataLabel, chartData and background colour
 */
 
 export function updateChart(newLabels, newData, colourArray){
-	myChart.data.labels = newLabels;
-	myChart.data.datasets[0].data = newData;
-	myChart.data.datasets[0].backgroundColor = colourArray;
-	myChart.update();
+myChart.data.labels = newLabels;
+myChart.data.datasets[0].data = newData;
+myChart.data.datasets[0].backgroundColor = colourArray;
+myChart.update();
 }
