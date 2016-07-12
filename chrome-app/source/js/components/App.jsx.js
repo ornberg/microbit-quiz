@@ -1,10 +1,10 @@
 import update from 'react-addons-update'
 import React, { Component } from 'react'
-import ConnectionStatus from '../components/ConnectionStatus'
-import AppButton from '../components/AppButton'
-import ChartPage from '../components/ChartPage'
-import Question from '../components/Question'
-import VoteCounter from '../components/VoteCounter'
+import ConnectionStatus from './ConnectionStatus'
+import AppButton from './AppButton'
+import ChartPage from './ChartPage'
+import Question from './Question'
+import VoteCounter from './VoteCounter'
 import Serial from '../classes/Serial.js'
 
 class App extends Component {
