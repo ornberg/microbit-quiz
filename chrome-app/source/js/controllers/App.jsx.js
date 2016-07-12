@@ -5,11 +5,11 @@ import AppButton from '../components/AppButton'
 import ChartPage from '../components/ChartPage'
 import Question from '../components/Question'
 import VoteCounter from '../components/VoteCounter'
-import { Serial } from '../main.js'
+import Serial from '../classes/Serial.js'
 
 class App extends Component {
-  constructor(props) {
-    super(props)
+  constructor() {
+    super();
     this.state = {
       voting: false,
       editing: false,
@@ -22,9 +22,32 @@ class App extends Component {
       voters: {},
       questionId: -1
     }
+    this.handlers = {
+      editAnswer: (index, event) => {
+        this.setState({
+          answers: update(this.state.answers, {[index]: { $set: (event.target.value)}})
+        })
+      },
+      delAnswer: (index, event) => {
+        if (this.state.answers.length <= 2)
+          return; //minimum of two answers
+          this.setState({
+            answers: update(this.state.answers, { $splice: [[index, 1]]})
+          })
+      },
+      addAnswer: (index, event) => {
+        this.setState({
+          answers: update(this.state.answers, { $push: ["???"]})
+        })
+      },
+      editQuestion: (index, event) => {
+        this.setState({
+          question: event.target.value
+        });
+      }
+    }
   }
   componentDidMount() {
-    var self = this;
 
     //Create a new serial connection manager, takes two functions:
       //1. called when data is received
@@ -33,13 +56,13 @@ class App extends Component {
     window.serial = new Serial(
       (data) => {
         if (data[0] === "ans" && this.state.voting) {
-          if (typeof self.state.voters[data[3]] === 'undefined') {
+          if (typeof this.state.voters[data[3]] === 'undefined') {
             var microbitId = data[3];
             var answerId = parseInt(data[4]);
-            self.setState({
-              votes: self.state.votes+1,
-              voters: update(self.state.voters, {[microbitId]: { $set: true}}),
-              answerCounts: update(self.state.answerCounts, {[answerId]: { $set: (self.state.answerCounts[parseInt(answerId)]+1)}})
+            this.setState({
+              votes: this.state.votes+1,
+              voters: update(this.state.voters, {[microbitId]: { $set: true}}),
+              answerCounts: update(this.state.answerCounts, {[answerId]: { $set: (this.state.answerCounts[parseInt(answerId)]+1)}})
             });
           }
           var cmd = "ack:" + data.join(":").substring(4) + ";"; //always ack even if it's a resubmission
@@ -47,7 +70,7 @@ class App extends Component {
         }
       },
       (connected) => {
-        self.setState({mbConnected: connected});
+        this.setState({mbConnected: connected});
         if (!connected) {
           //cancel any current vote
           if (this.state.voting)
@@ -101,80 +124,68 @@ class App extends Component {
     }
   }
 
-  setAnswer(index, event, evt) {
-    console.log(event, evt);
-    var self = this;
-    this.setState({
-      answers: update(self.state.answers, {[index]: { $set: (event.target.value)}})
-    })
-  }
-
-  deleteAnswer(index, event) {
-    if (this.state.answers.length <= 2) {
-      return; //minimum of two answers
-    }
-    var self = this;
-    this.setState({
-      answers: update(self.state.answers, { $splice: [[index, 1]]})
-    })
-  }
-
-  newAnswer(index, event, evt) {
-    console.log(event, evt);
-    var self = this;
-    this.setState({
-      answers: update(self.state.answers, { $push: ["???"]})
-    })
-  }
-
-  setQuestion(event) {
-    this.setState({
-      question: event.target.value
-    });
-  }
-
   render() {
-    console.log(this.state.answers);
-    var page;
+    var page, buttons;
     switch(this.state.page) {
+
       case "question":
         page =
-          <div className="wrapper">
-            <Question
-              edit={this.state.editing}
-              title={this.state.question}
-              answers={this.state.answers}
-              questionHandler={this.setQuestion.bind(this)}
-              answerHandler={this.setAnswer.bind(this)}
-              deleteAnswerHandler={this.deleteAnswer.bind(this)}
-              newAnswerHandler={this.newAnswer.bind(this)}
+          <Question
+            edit={this.state.editing}
+            title={this.state.question}
+            answers={this.state.answers}
+            handlers={this.handlers}
+          />
+        buttons =
+          <div className="bottom-container">
+            <VoteCounter votes={this.state.votes}/>
+            <AppButton
+              active={!this.state.editing}
+              text="Show Results" classNames="animated"
+              handleClick={this.setPage.bind(this, "results")}
             />
-            <div className="bottom-container">
-              <VoteCounter votes={this.state.votes}/>
-              <AppButton active={!this.state.editing} text="Show Results" classNames="animated" handleClick={this.setPage.bind(this, "results")}/>
-              <AppButton active={!this.state.voting} text={this.state.editing ? "Stop Editing" : "Edit Question"} classNames="animated" handleClick={this.toggleEdit.bind(this)}/>
-              <AppButton active={!this.state.editing && this.state.mbConnected} text={this.state.voting ? "Stop Vote" : "Start Vote"} classNames={this.state.voting ? "stop-btn animated" : "start-btn animated"} handleClick={this.toggleVote.bind(this)}/>
-            </div>
+            <AppButton
+              active={!this.state.voting}
+              text={this.state.editing ? "Stop Editing" : "Edit Question"}
+              classNames="animated"
+              handleClick={this.toggleEdit.bind(this)}
+            />
+            <AppButton
+              active={!this.state.editing && this.state.mbConnected}
+              text={this.state.voting ? "Stop Vote" : "Start Vote"}
+              handleClick={this.toggleVote.bind(this)}
+              classNames={this.state.voting ? "stop-btn animated" : "start-btn animated"}
+            />
           </div>
         break;
+
       case "results":
         page =
-          <div className="wrapper">
-            <ChartPage answers={this.state.answers} votes={this.state.answerCounts}/>
-            <AppButton active={true} text="Return" classNames="fixed-return-btn" handleClick={this.setPage.bind(this, "question")}/>
-          </div>
+          <ChartPage answers={this.state.answers} votes={this.state.answerCounts}/>
+        buttons =
+          <AppButton
+            active={true}
+            text="Return"
+            classNames="fixed-return-btn"
+            handleClick={this.setPage.bind(this, "question")}
+          />
         break;
+
       default:
         page =
-          <p>Failed</p>
+          <p>Failed to load page.</p>
+        buttons = null
     }
     return (
       <div>
         <ConnectionStatus connected={this.state.mbConnected}/>
-        {page}
+        <div className="wrapper">
+          {page}
+          {buttons}
+        </div>
       </div>
     );
   }
 }
 
-export default App
+export default App;
