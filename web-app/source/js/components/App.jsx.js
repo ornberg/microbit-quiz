@@ -11,13 +11,13 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
-      voting: false,
+      voting: false,                                      
       editing: false,
       votes: 0,
       mbConnected: false,
       page: "question",
-      question: "Do you like chocolate?",
-      answers: ["Yes", "No", "Maybe", "No answer"],
+      question: "Your Question Here",
+      answers: ["Answer 1", "Answer 2", "Answer 3..."],
       answerCounts: [0, 0, 0, 0],
       voters: {},
       questionId: -1
