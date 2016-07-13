@@ -37,6 +37,8 @@ class App extends Component {
           })
       },
       addAnswer: (index, event) => {
+        if (this.state.answers.length >= 11) //maximum of 11 answers
+          return;
         this.setState({
           answers: update(this.state.answers, { $push: ["???"]})
         })

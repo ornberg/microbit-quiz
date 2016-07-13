@@ -31,7 +31,7 @@ class Question extends Component {
         />
         <ul className={"answer-box" + (this.props.edit ? " edit" : "")}>
           {answers}
-          { this.props.edit ?
+          { this.props.edit && this.props.answers.length < 11 ?
             <li onClick={this.props.handlers.addAnswer} className="styled-box answer add-answer animated">
               <div className="add-answer-symbol animated"></div>
             </li>
