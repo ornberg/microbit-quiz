@@ -29,14 +29,16 @@
 html { /* Smoothens edges of fonts */
   text-rendering: optimizeLegibility !important;
   -webkit-font-smoothing: antialiased !important;
+  height: 100%;
 }
 
 body {
   color: #4c4c4c;
   margin: 0;
   background-color: #EDEDED;
-  background-color: #ededed;
+  background-color: #f5f5f5;
   font-family: "OpenSans-Regular";
+  height:100%;
 }
 
 #app-frame, #app-frame > div  {
