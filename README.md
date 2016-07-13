@@ -19,7 +19,7 @@ Quiz:bit utilises the micro:bit's radio and serial port connectivity to provide 
 For the C++ micro:bit programs, simply use the hex files provided under prebuilt, or take a look at setting up an offline-toolchain for the micro:bit with [yotta](http://lancaster-university.github.io/microbit-docs/offline-toolchains/#yotta).
 
 For the web-apps you will need the latest version of NodeJS, npm and Grunt.
-Navigate to the web-app directory and type **npm install** to download the dependencies. Type **grunt** or **grunt build-with-nwjs** - the latter of which can take a while - to build. The resulting web-app/build folder will include all the files needed for a Chrome App. nwjs apps for Windows and MAC OSX will be found under web-app/nwjsBuilds.
+Navigate to the web-app directory and type **npm install** to download the dependencies. Type **grunt** to build the source and **grunt build-with-windows**, **grunt build-with-mac** or **grunt build-with-nwjs** to build it with either (or both) nwjs applications. The resulting web-app/build folder will include all the files needed for a Chrome App. nwjs apps for Windows and MAC OSX will be found under web-app/nwjsBuilds.
 
 ## Links
 

@@ -61,16 +61,29 @@ module.exports = function(grunt) {
       }
     },
     nwjs: {
-      options: {
-          platforms: ['win64','osx64'],
-          macIcns: './source/img/icon-128.icns',
+      mac: {
+        options: {
+          platforms: ['osx64'],
+          macIcns: './source/img/icon.icns',
           buildDir: './nwjsBuild',
           cacheDir: './nwjsCache'
+        },
+        src: ['./build/**/*']
       },
-      src: ['./build/**/*']
+      windows: {
+        options: {
+          platforms: ['win64'],
+          winIco: './source/img/icon.ico',
+          buildDir: './nwjsBuild',
+          cacheDir: './nwjsCache'
+        },
+        src: ['./build/**/*']
+      }
     }
   });
   var tasks = ["clean:all", "copy", "babel", "browserify", "clean:js"];
   grunt.registerTask("default", tasks);
   grunt.registerTask("build-with-nwjs", tasks.concat("nwjs"));
+  grunt.registerTask("build-with-windows", tasks.concat("nwjs:windows"));
+  grunt.registerTask("build-with-mac", tasks.concat("nwjs:mac"));
 };
