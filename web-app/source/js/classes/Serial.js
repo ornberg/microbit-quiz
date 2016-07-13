@@ -1,5 +1,5 @@
 function Serial(dataCallback, connectCallback) {
-  
+
   var connected = false;                                  // whether or not a valid Quizmaster micro:bit is connected
   var CONNECTION_INFO = null;                             // holds the Chrome API serial connection info
   var serialBuffer = [];                                  // used to buffer data until we have a full commands
@@ -46,19 +46,13 @@ function Serial(dataCallback, connectCallback) {
     return arrayBuf;
   }
 
-  /* Convert given Uint8Array to String */
-  function strFromUtf8ArrayBuf(arrayBuf)
-  {
-    return escape(decodeURIComponent(String.fromCharCode.apply(null, arrayBuf)));
-  }
-
   /* Attempts to write given string to the connected serial device */
   function write(str)
   {
     if (CONNECTION_INFO)
     {
       console.log(str);
-      chrome.serial.send(CONNECTION_INFO.connectionId, utf8AbFromStr(str).buffer, function(info) { });
+      chrome.serial.send(CONNECTION_INFO.connectionId, utf8ArrayBufFromStr(str).buffer, function(info) { });
     }
   }
 
