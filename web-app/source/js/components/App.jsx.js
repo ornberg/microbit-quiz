@@ -11,17 +11,18 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
-      voting: false,                                      
-      editing: false,
-      votes: 0,
-      mbConnected: false,
-      page: "question",
+      voting: false,                                    // is a vote current underway
+      editing: false,                                   // whether we're currently in question+answer editing mode
+      votes: 0,                                         // how many unique votes we've received
+      mbConnected: false,                               // whether a valid Quizmaster micro:bit is connected
+      page: "question",                                 // current app page
       question: "Your Question Here",
       answers: ["Answer 1", "Answer 2", "Answer 3..."],
       answerCounts: [0, 0, 0, 0],
-      voters: {},
+      voters: {},                                       // an object used to store the unique micro:bit serials and prevent duplicate voting
       questionId: -1
     }
+
     this.handlers = {
       editAnswer: (index, event) => {
         this.setState({
@@ -29,8 +30,8 @@ class App extends Component {
         })
       },
       delAnswer: (index, event) => {
-        if (this.state.answers.length <= 2)
-          return; //minimum of two answers
+        if (this.state.answers.length <= 2) //minimum of two answers
+          return;
           this.setState({
             answers: update(this.state.answers, { $splice: [[index, 1]]})
           })
@@ -47,15 +48,20 @@ class App extends Component {
       }
     }
   }
+
   componentDidMount() {
 
-    //Create a new serial connection manager, takes two functions:
-      //1. called when data is received
-      //2. called when the microbit connection state changes
+    /* on App load we create a new serial connection manager that takes two callback functions:
+    /*   1. called when a full message is received from the serial connection
+    /*         data is an array of strings => [ command, quizID, questionID, serialNumber, answer ]
+    /*   2. called when the microbit connection state changes
+    /*         connected is a boolean representing the new (or current) connection state */
 
     window.serial = new Serial(
       (data) => {
+        // handle any received answers whilst voting
         if (data[0] === "ans" && this.state.voting) {
+          // ensure micro:bit serial hasn't already been seen this vote
           if (typeof this.state.voters[data[3]] === 'undefined') {
             var microbitId = data[3];
             var answerId = parseInt(data[4]);
@@ -65,18 +71,19 @@ class App extends Component {
               answerCounts: update(this.state.answerCounts, {[answerId]: { $set: (this.state.answerCounts[parseInt(answerId)]+1)}})
             });
           }
-          var cmd = "ack:" + data.join(":").substring(4) + ";"; //always ack even if it's a resubmission
+          // always acknowledge a received answer, even if we've already logged it, as we can assume the sender didn't receive the first acknowledgement
+          var cmd = "ack:" + data.join(":").substring(4) + ";";
           window.serial.write(cmd);
         }
       },
       (connected) => {
         this.setState({mbConnected: connected});
         if (!connected) {
-          //cancel any current vote
+          // cancel any current vote on loss of connection
           if (this.state.voting)
             this.toggleVote();
           setTimeout(function() {
-            //poll for a new micro:bit connection
+            // repeatedly poll for a new micro:bit connection
             window.serial.reconnect(function() {});
           }, 1000);
         }
@@ -102,14 +109,14 @@ class App extends Component {
     })
 
     if (startingNewVote) {
-      //reset any vote-related state
+      // reset any vote-related state
       this.setState({
         questionId: this.state.questionId+1,
         votes: 0,
         voters: {},
         answerCounts: Array.apply(null, Array(this.state.answers.length)).map(function() { return 0 })
       }, function() {
-          //AFTER the new state transaction finishes, start bursting set signals
+          //AFTER the new state transaction finishes, start broadcasting set commands (the question) periodically
           window.serial.write("set:ABCD:" + this.state.questionId + ":" + this.state.answers.length + ";");
           window.sendTimer = setInterval(
             function() {
@@ -119,7 +126,7 @@ class App extends Component {
       });
     }
     else {
-      //stop bursts when we stop voting
+      // stop broadcasting once a vote is stopped
       clearInterval(sendTimer);
     }
   }
