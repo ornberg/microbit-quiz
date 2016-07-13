@@ -23,8 +23,14 @@ Navigate to the web-app directory and type **npm install** to download the depen
 
 ## Links
 
-[NodeJS](https://nodejs.org/en/download/) | [Grunt](http://gruntjs.com) | [Chrome Apps](https://developer.chrome.com/apps/app_codelab_basics#developer-mode)
+[NodeJS](https://nodejs.org/en/download/) | [Grunt](http://gruntjs.com) | [Chrome Apps](https://developer.chrome.com/apps/app_codelab_basics#developer-mode) | [micro:bit](http://microbit.co.uk/)
 
-## BBC Community Guidelines
+## License & Copyright
+
+"BBC" and "micro:bit" are trade marks of the BBC.
 
 [BBC Community Guidelines](https://www.microbit.co.uk/help#sect_cg)
+
+Quiz:bit code is licensed under the MIT License (MIT).
+
+Copyright (c) 2016 Lancaster University, UK.
